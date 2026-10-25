@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local training database
+transaction.mv.db
+transaction.lock.db
+transaction.trace.db
+transaction.trace.db.old
+transaction.newFile
+transaction.tempFile
