@@ -39,3 +39,6 @@ transaction.trace.db
 transaction.trace.db.old
 transaction.newFile
 transaction.tempFile
+
+# Local database recovery artifacts
+db-recovery/
