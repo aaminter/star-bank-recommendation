@@ -107,6 +107,39 @@ class RecommendationRepositoryTest {
         assertFalse(metrics.hasDebit());
     }
 
+    @Test
+    void shouldSeparateDepositsAndWithdrawalsByProductType() {
+        UUID userId = UUID.randomUUID();
+
+        insertTransaction(savingProductId, userId, "DEPOSIT", 1_200);
+        insertTransaction(savingProductId, userId, "WITHDRAW", 900);
+        insertTransaction(debitProductId, userId, "DEPOSIT", 300);
+        insertTransaction(debitProductId, userId, "WITHDRAW", 100);
+
+        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
+
+        assertEquals(1_200, metrics.savingDeposits());
+        assertEquals(300, metrics.debitDeposits());
+        assertEquals(100, metrics.debitWithdrawals());
+    }
+
+    @Test
+    void shouldIgnoreTransactionsOfOtherUsers() {
+        UUID requestedUserId = UUID.randomUUID();
+        UUID anotherUserId = UUID.randomUUID();
+
+        insertTransaction(debitProductId, requestedUserId, "DEPOSIT", 1_000);
+        insertTransaction(debitProductId, anotherUserId, "DEPOSIT", 100_000);
+        insertTransaction(debitProductId, anotherUserId, "WITHDRAW", 50_000);
+
+        CustomerMetrics metrics =
+                repository.getCustomerMetrics(requestedUserId);
+
+        assertTrue(metrics.hasDebit());
+        assertEquals(1_000, metrics.debitDeposits());
+        assertEquals(0, metrics.debitWithdrawals());
+    }
+
     private UUID insertProduct(String type, String name) {
         UUID productId = UUID.randomUUID();
 
