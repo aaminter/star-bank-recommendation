@@ -2,17 +2,15 @@ package com.aaminter.starbankrecommendation.service;
 
 import com.aaminter.starbankrecommendation.dto.RecommendationDto;
 import com.aaminter.starbankrecommendation.model.CustomerMetrics;
-import com.aaminter.starbankrecommendation.repository.RecommendationRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class TopSavingRuleSet implements RecommendationRuleSet {
 
-    private static final UUID RECOMMENDATION_ID =
-            UUID.fromString("59efc529-2fff-41af-baff-90ccd7402925");
+    private static final java.util.UUID RECOMMENDATION_ID =
+            java.util.UUID.fromString("59efc529-2fff-41af-baff-90ccd7402925");
 
     private static final String NAME = "Top Saving";
 
@@ -30,16 +28,8 @@ public class TopSavingRuleSet implements RecommendationRuleSet {
             Начните использовать «Копилку» уже сегодня и станьте ближе к своим финансовым целям!
             """;
 
-    private final RecommendationRepository repository;
-
-    public TopSavingRuleSet(RecommendationRepository repository) {
-        this.repository = repository;
-    }
-
     @Override
-    public Optional<RecommendationDto> check(UUID userId) {
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
-
+    public Optional<RecommendationDto> check(CustomerMetrics metrics) {
         boolean hasEnoughDeposits =
                 metrics.debitDeposits() >= 50_000
                         || metrics.savingDeposits() >= 50_000;
@@ -56,12 +46,6 @@ public class TopSavingRuleSet implements RecommendationRuleSet {
             return Optional.empty();
         }
 
-        return Optional.of(
-                new RecommendationDto(
-                        NAME,
-                        RECOMMENDATION_ID,
-                        TEXT
-                )
-        );
+        return Optional.of(new RecommendationDto(NAME, RECOMMENDATION_ID, TEXT));
     }
 }

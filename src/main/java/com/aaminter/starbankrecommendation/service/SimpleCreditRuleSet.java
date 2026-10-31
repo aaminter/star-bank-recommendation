@@ -2,17 +2,15 @@ package com.aaminter.starbankrecommendation.service;
 
 import com.aaminter.starbankrecommendation.dto.RecommendationDto;
 import com.aaminter.starbankrecommendation.model.CustomerMetrics;
-import com.aaminter.starbankrecommendation.repository.RecommendationRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class SimpleCreditRuleSet implements RecommendationRuleSet {
 
-    private static final UUID RECOMMENDATION_ID =
-            UUID.fromString("ab138afb-f3ba-4a93-b74f-0fcee86d447f");
+    private static final java.util.UUID RECOMMENDATION_ID =
+            java.util.UUID.fromString("ab138afb-f3ba-4a93-b74f-0fcee86d447f");
 
     private static final String NAME = "Простой кредит";
 
@@ -32,16 +30,8 @@ public class SimpleCreditRuleSet implements RecommendationRuleSet {
             Не упустите возможность воспользоваться выгодными условиями кредитования от нашей компании!
             """;
 
-    private final RecommendationRepository repository;
-
-    public SimpleCreditRuleSet(RecommendationRepository repository) {
-        this.repository = repository;
-    }
-
     @Override
-    public Optional<RecommendationDto> check(UUID userId) {
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
-
+    public Optional<RecommendationDto> check(CustomerMetrics metrics) {
         boolean depositsExceedWithdrawals =
                 metrics.debitDeposits() > metrics.debitWithdrawals();
 
@@ -57,12 +47,6 @@ public class SimpleCreditRuleSet implements RecommendationRuleSet {
             return Optional.empty();
         }
 
-        return Optional.of(
-                new RecommendationDto(
-                        NAME,
-                        RECOMMENDATION_ID,
-                        TEXT
-                )
-        );
+        return Optional.of(new RecommendationDto(NAME, RECOMMENDATION_ID, TEXT));
     }
 }
