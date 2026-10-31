@@ -75,7 +75,8 @@ mvn spring-boot:run
 - `docs/architecture/` — схемы и описание компонентов;
 - `docs/adr/` — Architecture Decision Records (предлагаемые решения требуют подтверждения команды);
 - `docs/process/` — Definition of Done, Code Review, workflow, эскалация блокеров и распределение ответственности;
-- `docs/retrospective/` — итоги командной работы.
+- `docs/retrospective/` — итоги командной работы;
+- `docs/portfolio/case-study.md` — кейс по командной координации с проверяемыми доказательствами и открытыми пробелами.
 
 ## Статус
 
