@@ -1,5 +1,9 @@
 # Star Bank Recommendation
 
+![Java CI](https://github.com/aaminter/star-bank-recommendation/actions/workflows/ci.yml/badge.svg)
+
+Командный учебный backend-проект на Java и Spring Boot. Сервис формирует персональные рекомендации клиентам на основе данных транзакций и правил рекомендаций.
+
 Командный учебный backend-проект на Java и Spring Boot. Сервис формирует персональные рекомендации клиентам на основе данных транзакций и правил рекомендаций.
 
 ## Цель
