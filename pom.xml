@@ -11,21 +11,8 @@
 	<groupId>com.aaminter</groupId>
 	<artifactId>star-bank-recommendation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>star-bank-recommendation</name>
+	<description>Educational Spring Boot service for customer recommendations and dynamic rules</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
