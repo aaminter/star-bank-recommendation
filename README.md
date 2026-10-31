@@ -69,9 +69,12 @@ mvn spring-boot:run
 
 ## Документы
 
+- `CONTRIBUTING.md` — правила участия в разработке;
+- `SECURITY.md` — безопасная обработка уязвимостей и секретов;
+- `.github/pull_request_template.md` — шаблон Pull Request;
 - `docs/architecture/` — схемы и описание компонентов;
-- `docs/adr/` — Architecture Decision Records;
-- `docs/process/` — правила разработки, Definition of Done и Code Review;
+- `docs/adr/` — Architecture Decision Records (предлагаемые решения требуют подтверждения команды);
+- `docs/process/` — Definition of Done, Code Review, workflow и эскалация блокеров;
 - `docs/retrospective/` — итоги командной работы.
 
 ## Статус
