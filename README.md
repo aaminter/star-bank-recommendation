@@ -74,7 +74,7 @@ mvn spring-boot:run
 - `.github/pull_request_template.md` — шаблон Pull Request;
 - `docs/architecture/` — схемы и описание компонентов;
 - `docs/adr/` — Architecture Decision Records (предлагаемые решения требуют подтверждения команды);
-- `docs/process/` — Definition of Done, Code Review, workflow и эскалация блокеров;
+- `docs/process/` — Definition of Done, Code Review, workflow, эскалация блокеров и распределение ответственности;
 - `docs/retrospective/` — итоги командной работы.
 
 ## Статус
