@@ -3,15 +3,16 @@
 - Status: Working agreement, pending confirmation by both contributors
 - Updated: 2026-10-31
 
-## Initial module ownership
+## Current task ownership
 
 | Area | Owner | Scope |
 |---|---|---|
-| Separate PostgreSQL datasource, DynamicRule persistence, CRUD API and CRUD tests | `tani9kuz-lang` | Issues #4–#7 |
-| Dynamic condition handlers, AND/negate semantics, recommendation API integration, cache and engine tests | `aaminter` | Issues #8–#12 |
+| Separate PostgreSQL datasource, DynamicRule persistence, Liquibase migrations, CRUD REST API and tests | `tani9kuz-lang` | Issue #4 |
+| Dynamic condition handlers, comparison operators, AND/negate semantics, Caffeine cache and engine tests | `aaminter` | Issue #8 |
+| Integration of dynamic rules into `GET /recommendation/{user_id}` | `aaminter` | Issue #10 |
 | End-to-end integration and joint acceptance | Both contributors | Issue #13 |
 
-This is the current task split reflected in GitHub Issues. It is not a permanent hierarchy and should be adjusted if workload or dependencies change.
+The current split reflects the consolidated GitHub Issues. Earlier task ranges (#5–#7 and #8–#12) are no longer used as the ownership reference.
 
 ## Coordination
 
@@ -42,7 +43,7 @@ When blocked, report the expected behavior, observed result, attempted steps, de
 
 ## Confirmation required
 
-- [ ] Both contributors confirm the initial ownership split.
+- [ ] Both contributors confirm the current ownership split.
 - [ ] Agree review response expectations.
 - [ ] Agree who merges PRs and handles urgent integration conflicts.
 - [ ] Revisit ownership if dates or scope change.
