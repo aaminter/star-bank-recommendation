@@ -7,52 +7,48 @@
 
 ## Problem
 
-Extend an existing recommendation service with dynamic rules while preserving the behavior of existing fixed rules and protecting the supplied H2 transaction/product database from writes.
+Extend an existing recommendation service with dynamic rules while preserving fixed-rule behavior and protecting the supplied H2 transaction/product database from writes.
 
-## Technical context
+## Technical baseline
 
-- Java 17 and Spring Boot 4.1.2
-- Spring MVC and JDBC/JdbcTemplate in the existing baseline
+- Java 17, Spring Boot 4.1.2
+- Spring MVC and JDBC/JdbcTemplate
 - H2 as a read-only source for transaction/product data
-- Planned extension: separate PostgreSQL storage, Liquibase migrations, dynamic rule evaluation, and Caffeine caching
+- Three fixed recommendation rules
+- One CustomerMetrics snapshot per request, shared by all fixed rules
+- JUnit and Spring Boot Test
 
-The README and architecture overview distinguish the existing baseline from components that are still being implemented.
+Dynamic rule storage, PostgreSQL, Liquibase, CRUD and Caffeine caching remain planned/in progress until delivered through merged and tested PRs.
 
-## Coordination and engineering work
+## Engineering evidence
 
-The repository contains concrete artifacts for the following practices:
-
-1. **Task decomposition:** GitHub Issues split the work into persistence/CRUD, rule evaluation, API integration, caching, tests, and joint integration.
-2. **Parallel ownership:** CRUD/persistence and evaluation/integration work have separate owners, with a joint integration issue.
-3. **Contract-first design:** proposed ADRs capture the read-only H2 boundary, first-version condition semantics, and cache invalidation concerns.
-4. **Quality process:** Definition of Done, code review guidance, development workflow, PR template, and security policy are documented.
-5. **Integration management:** a dependency-aware integration issue defines acceptance criteria and protects fixed-rule behavior.
-6. **Automation:** GitHub Actions runs Maven `clean verify` on pushes and pull requests.
-
-## Evidence
-
-- [Project README](../../README.md)
+- [README](../../README.md)
+- [PR #19: reuse one metrics query per request](https://github.com/aaminter/star-bank-recommendation/pull/19)
 - [Issues](https://github.com/aaminter/star-bank-recommendation/issues)
-- [Pull Requests](https://github.com/aaminter/star-bank-recommendation/pulls)
 - [Architecture overview](../architecture/overview.md)
-- [Proposed ADRs](../adr/)
+- [ADR proposals](../adr/)
 - [Definition of Done](../process/definition-of-done.md)
 - [Code review guidelines](../process/code-review-guidelines.md)
 - [Roles and responsibilities](../process/roles-and-responsibilities.md)
 - [Integration and escalation](../process/integration-and-escalation.md)
 - [CI workflow](../../.github/workflows/ci.yml)
 
-## What this case demonstrates
+## Team coordination evidence
 
-The current repository demonstrates the ability to structure a small team development effort, make dependencies visible, define quality gates, document architectural trade-offs, and plan integration.
+The repository includes task decomposition, role definitions, review guidance, integration criteria and ADR proposals. These are process artifacts, not proof that a contributor-owned module has already been independently delivered and reviewed.
 
-It does **not yet prove** production Team Lead experience, successful delivery of every planned feature, or a green CI history. Those claims require merged implementation PRs, passing CI runs, review evidence, and a completed retrospective.
+The four-week [Team Lead Evidence Sprint](team-lead-evidence-sprint.md) defines the evidence required for a 5/5 result. The tracking Issue is [#18](https://github.com/aaminter/star-bank-recommendation/issues/18).
 
-## Evidence still to add
+## Current gaps
 
-- [ ] Merged implementation PRs for the dynamic rule engine and CRUD modules.
-- [ ] Green CI runs for the main branch and feature PRs.
-- [ ] Tests proving fixed-rule compatibility and read-only H2 behavior.
-- [ ] Accepted ADRs after team discussion.
-- [ ] Joint integration result and completed retrospective.
-- [ ] Measured test coverage and build status.
+- [ ] Tatyana independently delivers an agreed module through a PR.
+- [ ] A substantive review is completed with inline comments and contributor fixes.
+- [ ] ADRs are discussed and accepted by the team.
+- [ ] Dynamic-rule storage and CRUD are implemented with PostgreSQL and Liquibase.
+- [ ] Engine integration is completed with regression tests.
+- [ ] CI is green on the relevant PR and target branch.
+- [ ] Retrospective is completed with measured delivery/review/quality metrics.
+
+## Honest assessment
+
+The current repository demonstrates backend implementation and preparation of a small-team workflow. It does not yet prove production Team Lead experience or the full 5/5 collaborative delivery cycle. Claims must be updated only when linked evidence exists.
