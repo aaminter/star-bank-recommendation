@@ -1,5 +1,6 @@
 package com.aaminter.starbankrecommendation.config;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +12,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import jakarta.persistence.EntityManagerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-
         basePackages = "com.aaminter.starbankrecommendation.repository.recommendations",
         entityManagerFactoryRef = "recommendationsEntityManagerFactory",
         transactionManagerRef = "recommendationsTransactionManager"
@@ -31,8 +30,7 @@ public class RecommendationsJpaConfig {
             @Qualifier("recommendationsDataSource") DataSource dataSource) {
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.ddl-auto", "none");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        properties.put("hibernate.hbm2ddl.auto", "none");
 
         return builder
                 .dataSource(dataSource)

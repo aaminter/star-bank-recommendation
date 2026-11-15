@@ -22,7 +22,7 @@ public class DynamicRuleController {
     @PostMapping
     public ResponseEntity<DynamicRuleDto> createRule(@RequestBody DynamicRuleDto ruleDto) {
         DynamicRuleDto created = ruleService.createRule(ruleDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.ok(created);
     }
 
     @GetMapping
