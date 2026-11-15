@@ -1,0 +1,50 @@
+package com.aaminter.starbankrecommendation.config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.jpa.EntityManagerFactoryBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
+import jakarta.persistence.EntityManagerFactory;
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(
+
+        basePackages = "com.aaminter.starbankrecommendation.repository.recommendations",
+        entityManagerFactoryRef = "recommendationsEntityManagerFactory",
+        transactionManagerRef = "recommendationsTransactionManager"
+)
+public class RecommendationsJpaConfig {
+
+    @Bean(name = "recommendationsEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean recommendationsEntityManagerFactory(
+            EntityManagerFactoryBuilder builder,
+            @Qualifier("recommendationsDataSource") DataSource dataSource) {
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("hibernate.ddl-auto", "none");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+
+        return builder
+                .dataSource(dataSource)
+                .packages("com.aaminter.starbankrecommendation.model.recommendations")
+                .persistenceUnit("recommendations")
+                .properties(properties)
+                .build();
+    }
+
+    @Bean(name = "recommendationsTransactionManager")
+    public PlatformTransactionManager recommendationsTransactionManager(
+            @Qualifier("recommendationsEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
+}
