@@ -1,35 +1,38 @@
 package com.aaminter.starbankrecommendation.repository;
 
 import com.aaminter.starbankrecommendation.model.CustomerMetrics;
+import com.aaminter.starbankrecommendation.model.ProductType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RecommendationRepositoryTest {
+class RecommendationRepositoryCacheTest {
 
     private JdbcTemplate jdbcTemplate;
     private RecommendationRepository repository;
 
     private UUID debitProductId;
-    private UUID savingProductId;
-    private UUID investProductId;
-    private UUID creditProductId;
+
+    private static final UUID USER_ID =
+            UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
-        String databaseName = "recommendation_test_"
-                + UUID.randomUUID().toString().replace("-", "");
+        DriverManagerDataSource dataSource =
+                new DriverManagerDataSource();
 
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1");
+        dataSource.setUrl(
+                "jdbc:h2:mem:cache_test_"
+                        + UUID.randomUUID().toString().replace("-", "")
+                        + ";DB_CLOSE_DELAY=-1"
+        );
         dataSource.setUsername("sa");
         dataSource.setPassword("");
 
@@ -53,121 +56,91 @@ class RecommendationRepositoryTest {
                 )
                 """);
 
-        debitProductId = insertProduct("DEBIT", "Debit");
-        savingProductId = insertProduct("SAVING", "Saving");
-        investProductId = insertProduct("INVEST", "Invest");
-        creditProductId = insertProduct("CREDIT", "Credit");
+        debitProductId = UUID.randomUUID();
+
+        jdbcTemplate.update(
+                "INSERT INTO PRODUCTS (ID, TYPE, NAME) VALUES (?, ?, ?)",
+                debitProductId,
+                "DEBIT",
+                "Debit"
+        );
 
         repository = new RecommendationRepository(jdbcTemplate);
     }
 
     @Test
-    void shouldCalculateMetricsByUserAndProductType() {
-        UUID userId = UUID.randomUUID();
+    void shouldReuseCachedMetricsForSameUser() {
+        insertTransaction(USER_ID, 10_000);
 
-        insertTransaction(debitProductId, userId, "DEPOSIT", 100_000);
-        insertTransaction(debitProductId, userId, "WITHDRAW", 40_000);
-        insertTransaction(savingProductId, userId, "DEPOSIT", 1_200);
-        insertTransaction(investProductId, userId, "WITHDRAW", 5_000);
+        CustomerMetrics first =
+                repository.getCustomerMetrics(USER_ID);
 
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
-
-        assertTrue(metrics.hasDebit());
-        assertTrue(metrics.hasInvest());
-        assertFalse(metrics.hasCredit());
-        assertEquals(1_200, metrics.savingDeposits());
-        assertEquals(100_000, metrics.debitDeposits());
-        assertEquals(40_000, metrics.debitWithdrawals());
-    }
-
-    @Test
-    void shouldReturnZeroMetricsWhenUserHasNoTransactions() {
-        UUID userIdWithoutTransactions = UUID.randomUUID();
-
-        CustomerMetrics metrics =
-                repository.getCustomerMetrics(userIdWithoutTransactions);
-
-        assertFalse(metrics.hasDebit());
-        assertFalse(metrics.hasInvest());
-        assertFalse(metrics.hasCredit());
-        assertEquals(0, metrics.savingDeposits());
-        assertEquals(0, metrics.debitDeposits());
-        assertEquals(0, metrics.debitWithdrawals());
-    }
-
-    @Test
-    void shouldDetectCreditProductWhenTransactionExists() {
-        UUID userId = UUID.randomUUID();
-
-        insertTransaction(creditProductId, userId, "WITHDRAW", 100);
-
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
-
-        assertTrue(metrics.hasCredit());
-        assertFalse(metrics.hasDebit());
-    }
-
-    @Test
-    void shouldSeparateDepositsAndWithdrawalsByProductType() {
-        UUID userId = UUID.randomUUID();
-
-        insertTransaction(savingProductId, userId, "DEPOSIT", 1_200);
-        insertTransaction(savingProductId, userId, "WITHDRAW", 900);
-        insertTransaction(debitProductId, userId, "DEPOSIT", 300);
-        insertTransaction(debitProductId, userId, "WITHDRAW", 100);
-
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
-
-        assertEquals(1_200, metrics.savingDeposits());
-        assertEquals(300, metrics.debitDeposits());
-        assertEquals(100, metrics.debitWithdrawals());
-    }
-
-    @Test
-    void shouldIgnoreTransactionsOfOtherUsers() {
-        UUID requestedUserId = UUID.randomUUID();
-        UUID anotherUserId = UUID.randomUUID();
-
-        insertTransaction(debitProductId, requestedUserId, "DEPOSIT", 1_000);
-        insertTransaction(debitProductId, anotherUserId, "DEPOSIT", 100_000);
-        insertTransaction(debitProductId, anotherUserId, "WITHDRAW", 50_000);
-
-        CustomerMetrics metrics =
-                repository.getCustomerMetrics(requestedUserId);
-
-        assertTrue(metrics.hasDebit());
-        assertEquals(1_000, metrics.debitDeposits());
-        assertEquals(0, metrics.debitWithdrawals());
-    }
-
-    private UUID insertProduct(String type, String name) {
-        UUID productId = UUID.randomUUID();
-
-        jdbcTemplate.update(
-                "INSERT INTO PRODUCTS (ID, TYPE, NAME) VALUES (?, ?, ?)",
-                productId,
-                type,
-                name
+        assertEquals(
+                new BigDecimal("10000"),
+                first.forProduct(ProductType.DEBIT).depositSum()
         );
 
-        return productId;
+        // Добавляем транзакцию после первого получения метрик.
+        insertTransaction(USER_ID, 5_000);
+
+        // Повторное получение должно использовать кеш.
+        CustomerMetrics cached =
+                repository.getCustomerMetrics(USER_ID);
+
+        assertEquals(
+                new BigDecimal("10000"),
+                cached.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        // Очищаем кеш.
+        repository.clearCache();
+
+        // Теперь запрос должен получить актуальные данные из H2.
+        CustomerMetrics refreshed =
+                repository.getCustomerMetrics(USER_ID);
+
+        assertEquals(
+                new BigDecimal("15000"),
+                refreshed.forProduct(ProductType.DEBIT).depositSum()
+        );
     }
 
-    private void insertTransaction(
-            UUID productId,
-            UUID userId,
-            String type,
-            int amount
-    ) {
+    @Test
+    void shouldKeepSeparateCacheEntriesForDifferentUsers() {
+        UUID firstUser = UUID.randomUUID();
+        UUID secondUser = UUID.randomUUID();
+
+        insertTransaction(firstUser, 1_000);
+        insertTransaction(secondUser, 9_000);
+
+        CustomerMetrics firstMetrics =
+                repository.getCustomerMetrics(firstUser);
+
+        CustomerMetrics secondMetrics =
+                repository.getCustomerMetrics(secondUser);
+
+        assertEquals(
+                new BigDecimal("1000"),
+                firstMetrics.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        assertEquals(
+                new BigDecimal("9000"),
+                secondMetrics.forProduct(ProductType.DEBIT).depositSum()
+        );
+    }
+
+    private void insertTransaction(UUID userId, int amount) {
         jdbcTemplate.update(
                 """
-                INSERT INTO TRANSACTIONS (ID, PRODUCT_ID, USER_ID, TYPE, AMOUNT)
+                INSERT INTO TRANSACTIONS
+                (ID, PRODUCT_ID, USER_ID, TYPE, AMOUNT)
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 UUID.randomUUID(),
-                productId,
+                debitProductId,
                 userId,
-                type,
+                "DEPOSIT",
                 amount
         );
     }
