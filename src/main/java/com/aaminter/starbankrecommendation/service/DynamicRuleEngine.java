@@ -213,6 +213,12 @@ public class DynamicRuleEngine {
             String operator,
             BigDecimal right
     ) {
+        if (operator == null) {
+            throw new IllegalArgumentException(
+                    "Comparison operator must not be null"
+            );
+        }
+
         int comparison = left.compareTo(right);
 
         return switch (operator) {
