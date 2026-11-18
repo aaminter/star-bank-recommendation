@@ -21,8 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		"spring.datasource.url=jdbc:h2:mem:recommendation_integration;DB_CLOSE_DELAY=-1",
 		"spring.datasource.username=sa",
 		"spring.datasource.password=",
-		"spring.datasource.hikari.read-only=false"
+		"spring.datasource.hikari.read-only=false",
+		"spring.liquibase.enabled=false"
 })
+
 @AutoConfigureMockMvc
 class StarBankRecommendationApplicationTests {
 

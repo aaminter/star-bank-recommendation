@@ -4,6 +4,7 @@ import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
 import com.aaminter.starbankrecommendation.dto.RuleQueryDto;
 import com.aaminter.starbankrecommendation.model.recommendations.DynamicRule;
 import com.aaminter.starbankrecommendation.repository.recommendations.DynamicRuleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.JacksonException;
@@ -56,16 +57,22 @@ public class DynamicRuleService {
                 .toList();
     }
 
+
     @Transactional("recommendationsTransactionManager")
     public void deleteRule(Long id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Правило с id " + id + " не найдено");
+        }
         repository.deleteById(id);
     }
+
 
     private DynamicRuleDto mapToDto(DynamicRule entity) {
         try {
             List<RuleQueryDto> queries = objectMapper.readValue(
                     entity.getRule(),
-                    new TypeReference<>() {}
+                    new TypeReference<>() {
+                    }
             );
 
             return new DynamicRuleDto(

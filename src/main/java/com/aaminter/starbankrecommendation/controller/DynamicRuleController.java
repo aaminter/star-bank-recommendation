@@ -2,7 +2,7 @@ package com.aaminter.starbankrecommendation.controller;
 
 import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
 import com.aaminter.starbankrecommendation.service.DynamicRuleService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +20,7 @@ public class DynamicRuleController {
     }
 
     @PostMapping
-    public ResponseEntity<DynamicRuleDto> createRule(@RequestBody DynamicRuleDto ruleDto) {
+    public ResponseEntity<DynamicRuleDto> createRule(@Valid @RequestBody DynamicRuleDto ruleDto) {
         DynamicRuleDto created = ruleService.createRule(ruleDto);
         return ResponseEntity.ok(created);
     }

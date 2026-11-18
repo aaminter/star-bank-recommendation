@@ -35,7 +35,7 @@ class DynamicRuleServiceTest {
 
     @Test
     void createRule_ShouldSaveAndReturnDtoWithGeneratedId() {
-        // Подготовка данных
+
         UUID productId = UUID.randomUUID();
         List<RuleQueryDto> queries = List.of(
                 new RuleQueryDto("USER_OF", List.of("CREDIT"), true),
@@ -49,17 +49,15 @@ class DynamicRuleServiceTest {
                 queries
         );
 
-        // Настройка мока репозитория
         when(repository.save(any(DynamicRule.class))).thenAnswer(invocation -> {
             DynamicRule entity = invocation.getArgument(0);
-            entity.setId(1L); // Имитируем автогенерацию ID в PostgreSQL
+            entity.setId(1L);
             return entity;
         });
 
-        // Выполнение
         DynamicRuleDto result = ruleService.createRule(inputDto);
 
-        // Проверка
+
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("Простой кредит", result.productName());
@@ -71,7 +69,6 @@ class DynamicRuleServiceTest {
 
     @Test
     void getAllRules_ShouldReturnMappedListOfDtos() {
-        // Подготовка данных
         UUID productId = UUID.randomUUID();
         String jsonRule = "[{\"query\":\"USER_OF\",\"arguments\":[\"DEBIT\"],\"negate\":false}]";
         DynamicRule entity = new DynamicRule(productId, "Дебетовая карта", "Текст", jsonRule);
@@ -79,10 +76,9 @@ class DynamicRuleServiceTest {
 
         when(repository.findAll()).thenReturn(List.of(entity));
 
-        // Выполнение
+
         List<DynamicRuleDto> rules = ruleService.getAllRules();
 
-        // Проверка
         assertEquals(1, rules.size());
         DynamicRuleDto dto = rules.get(0);
         assertEquals(10L, dto.id());
@@ -95,13 +91,22 @@ class DynamicRuleServiceTest {
 
     @Test
     void deleteRule_ShouldCallRepositoryDeleteById() {
-        // Подготовка данных
         Long ruleId = 5L;
+        when(repository.existsById(ruleId)).thenReturn(true);
 
-        // Выполнение
         ruleService.deleteRule(ruleId);
 
-        // Проверка
+        verify(repository, times(1)).existsById(ruleId);
         verify(repository, times(1)).deleteById(ruleId);
     }
+
+    @Test
+    void deleteRule_WhenNotFound_ShouldThrowException() {
+        Long ruleId = 999L;
+        when(repository.existsById(ruleId)).thenReturn(false);
+
+        assertThrows(jakarta.persistence.EntityNotFoundException.class, () -> ruleService.deleteRule(ruleId));
+        verify(repository, never()).deleteById(any());
+    }
+
 }
