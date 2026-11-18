@@ -298,6 +298,23 @@ class DynamicRuleEngineTest {
                         ))
                 )
         );
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> engine.matches(
+                        metrics,
+                        List.of(condition(
+                                "TRANSACTION_SUM_COMPARE",
+                                List.of(
+                                        "DEBIT",
+                                        "DEPOSIT",
+                                        "!=",
+                                        "100"
+                                ),
+                                false
+                        ))
+                )
+        );
     }
 
     @Test
