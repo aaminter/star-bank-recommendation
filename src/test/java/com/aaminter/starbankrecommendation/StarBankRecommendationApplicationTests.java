@@ -1,6 +1,7 @@
 
 package com.aaminter.starbankrecommendation;
 
+import com.aaminter.starbankrecommendation.repository.RecommendationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ class StarBankRecommendationApplicationTests {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	private RecommendationRepository recommendationRepository;
+
 	private UUID debitProductId;
 	private UUID savingProductId;
 
@@ -66,6 +70,9 @@ class StarBankRecommendationApplicationTests {
 
 		debitProductId = insertProduct("DEBIT", "Debit");
 		savingProductId = insertProduct("SAVING", "Saving");
+
+		// Очищаем кеш после подготовки новой тестовой БД.
+		recommendationRepository.clearCache();
 	}
 
 	@Test
