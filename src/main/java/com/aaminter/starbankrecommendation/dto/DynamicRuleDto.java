@@ -24,6 +24,6 @@ public record DynamicRuleDto(
         String productText,
 
         @NotEmpty(message = "Правило должно содержать хотя бы одно условие")
-        @Valid
-        List<RuleQueryDto> rule
+
+        List<@Valid RuleQueryDto> rule
 ) {}
