@@ -1,4 +1,3 @@
-
 package com.aaminter.starbankrecommendation.service;
 
 import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
@@ -26,17 +25,20 @@ public class RecommendationService {
     private final List<RecommendationRuleSet> ruleSets;
     private final DynamicRuleService dynamicRuleService;
     private final DynamicRuleEngine dynamicRuleEngine;
+    private final RuleStatsService ruleStatsService;
 
     public RecommendationService(
             RecommendationRepository repository,
             List<RecommendationRuleSet> ruleSets,
             DynamicRuleService dynamicRuleService,
-            DynamicRuleEngine dynamicRuleEngine
+            DynamicRuleEngine dynamicRuleEngine,
+            RuleStatsService ruleStatsService
     ) {
         this.repository = repository;
         this.ruleSets = ruleSets;
         this.dynamicRuleService = dynamicRuleService;
         this.dynamicRuleEngine = dynamicRuleEngine;
+        this.ruleStatsService = ruleStatsService;
     }
 
     public RecommendationResponse getRecommendations(UUID userId) {
@@ -54,6 +56,8 @@ public class RecommendationService {
         List<DynamicRuleDto> dynamicRules = dynamicRuleService.getAllRules();
 
         for (DynamicRuleDto rule : dynamicRules) {
+            boolean matches;
+
             try {
                 List<DynamicRuleCondition> conditions = rule.rule().stream()
                         .map(condition -> new DynamicRuleCondition(
@@ -63,13 +67,7 @@ public class RecommendationService {
                         ))
                         .toList();
 
-                if (dynamicRuleEngine.matches(metrics, conditions)) {
-                    recommendations.add(new RecommendationDto(
-                            rule.productName(),
-                            rule.productId(),
-                            rule.productText()
-                    ));
-                }
+                matches = dynamicRuleEngine.matches(metrics, conditions);
             } catch (IllegalArgumentException | NullPointerException e) {
                 log.warn(
                         "Skipping invalid dynamic rule with id {}: {}",
@@ -77,6 +75,17 @@ public class RecommendationService {
                         e.getMessage(),
                         e
                 );
+                continue;
+            }
+
+            if (matches) {
+                recommendations.add(new RecommendationDto(
+                        rule.productName(),
+                        rule.productId(),
+                        rule.productText()
+                ));
+
+                ruleStatsService.increment(rule.id());
             }
         }
 

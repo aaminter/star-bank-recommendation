@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -52,6 +53,9 @@ class RecommendationServiceTest {
     @Mock
     private DynamicRuleEngine dynamicRuleEngine;
 
+    @Mock
+    private RuleStatsService ruleStatsService;
+
     private RecommendationService service;
 
     @BeforeEach
@@ -60,7 +64,8 @@ class RecommendationServiceTest {
                 repository,
                 List.of(firstRule, secondRule, thirdRule),
                 dynamicRuleService,
-                dynamicRuleEngine
+                dynamicRuleEngine,
+                ruleStatsService
         );
     }
 
@@ -117,6 +122,7 @@ class RecommendationServiceTest {
                 METRICS,
                 List.of(new DynamicRuleCondition("USER_OF", List.of("CREDIT"), true))
         );
+        verify(ruleStatsService).increment(1L);
     }
 
     @Test
@@ -148,6 +154,7 @@ class RecommendationServiceTest {
                 METRICS,
                 List.of(new DynamicRuleCondition("USER_OF", List.of("CREDIT"), false))
         );
+        verify(ruleStatsService, never()).increment(1L);
     }
 
     @Test
@@ -171,6 +178,7 @@ class RecommendationServiceTest {
         verify(repository).getCustomerMetrics(USER_ID);
         verify(dynamicRuleService).getAllRules();
         verifyNoInteractions(dynamicRuleEngine);
+        verifyNoInteractions(ruleStatsService);
     }
 
     @Test
@@ -252,6 +260,9 @@ class RecommendationServiceTest {
                         false
                 ))
         );
+
+        verify(ruleStatsService).increment(11L);
+        verify(ruleStatsService, never()).increment(10L);
     }
 
     private DynamicRuleDto dynamicRule(

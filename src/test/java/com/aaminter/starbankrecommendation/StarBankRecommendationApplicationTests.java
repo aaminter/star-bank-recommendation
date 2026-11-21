@@ -4,6 +4,7 @@ package com.aaminter.starbankrecommendation;
 import com.aaminter.starbankrecommendation.model.recommendations.DynamicRule;
 import com.aaminter.starbankrecommendation.repository.RecommendationRepository;
 import com.aaminter.starbankrecommendation.repository.recommendations.DynamicRuleRepository;
+import com.aaminter.starbankrecommendation.service.RuleStatsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.sql.DataSource;
@@ -57,6 +59,9 @@ class StarBankRecommendationApplicationTests {
     @Autowired
     @Qualifier("recommendationsDataSource")
     private DataSource recommendationsDataSource;
+
+    @MockitoBean
+    private RuleStatsService ruleStatsService;
 
     private UUID debitProductId;
     private UUID savingProductId;

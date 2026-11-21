@@ -1,0 +1,34 @@
+package com.aaminter.starbankrecommendation.model.recommendations;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "dynamic_rule_stats")
+public class RuleStats {
+
+    @Id
+    @Column(name = "rule_id")
+    private Long ruleId;
+
+    @Column(name = "count", nullable = false)
+    private Long count;
+
+    protected RuleStats() {
+    }
+
+    public RuleStats(Long ruleId, Long count) {
+        this.ruleId = ruleId;
+        this.count = count;
+    }
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public Long getCount() {
+        return count;
+    }
+}
