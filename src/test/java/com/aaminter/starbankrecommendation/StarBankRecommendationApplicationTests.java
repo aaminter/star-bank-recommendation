@@ -1,4 +1,3 @@
-
 package com.aaminter.starbankrecommendation;
 
 import com.aaminter.starbankrecommendation.repository.RecommendationRepository;
@@ -22,7 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		"spring.datasource.url=jdbc:h2:mem:recommendation_integration;DB_CLOSE_DELAY=-1",
 		"spring.datasource.username=sa",
 		"spring.datasource.password=",
-		"spring.datasource.hikari.read-only=false"
+		"spring.datasource.hikari.read-only=false",
+		"spring.liquibase.enabled=false",
+		"custom.datasource.recommendations.jdbc-url=jdbc:h2:mem:rec_dummy;DB_CLOSE_DELAY=-1",
+		"custom.datasource.recommendations.driver-class-name=org.h2.Driver",
+		"custom.datasource.recommendations.username=sa",
+		"custom.datasource.recommendations.password="
 })
 @AutoConfigureMockMvc
 class StarBankRecommendationApplicationTests {
