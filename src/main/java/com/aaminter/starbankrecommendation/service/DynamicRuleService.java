@@ -1,3 +1,4 @@
+
 package com.aaminter.starbankrecommendation.service;
 
 import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
@@ -5,21 +6,30 @@ import com.aaminter.starbankrecommendation.dto.RuleQueryDto;
 import com.aaminter.starbankrecommendation.model.recommendations.DynamicRule;
 import com.aaminter.starbankrecommendation.repository.recommendations.DynamicRuleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class DynamicRuleService {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(DynamicRuleService.class);
+
     private final DynamicRuleRepository repository;
     private final ObjectMapper objectMapper;
 
-    public DynamicRuleService(DynamicRuleRepository repository, ObjectMapper objectMapper) {
+    public DynamicRuleService(
+            DynamicRuleRepository repository,
+            ObjectMapper objectMapper
+    ) {
         this.repository = repository;
         this.objectMapper = objectMapper;
     }
@@ -46,26 +56,41 @@ public class DynamicRuleService {
                     dto.rule()
             );
         } catch (JacksonException e) {
-            throw new RuntimeException("Ошибка при сериализации условий в JSON", e);
+            throw new RuntimeException(
+                    "Ошибка при сериализации условий в JSON", e
+            );
         }
     }
 
     @Transactional(value = "recommendationsTransactionManager", readOnly = true)
     public List<DynamicRuleDto> getAllRules() {
-        return repository.findAll().stream()
-                .map(this::mapToDto)
-                .toList();
-    }
+        List<DynamicRuleDto> rules = new ArrayList<>();
 
+        for (DynamicRule entity : repository.findAll()) {
+            try {
+                rules.add(mapToDto(entity));
+            } catch (InvalidDynamicRuleException e) {
+                log.warn(
+                        "Skipping invalid dynamic rule with id {}: {}",
+                        entity.getId(),
+                        e.getMessage()
+                );
+            }
+        }
+
+        return rules;
+    }
 
     @Transactional("recommendationsTransactionManager")
     public void deleteRule(Long id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Правило с id " + id + " не найдено");
+            throw new EntityNotFoundException(
+                    "Правило с id " + id + " не найдено"
+            );
         }
+
         repository.deleteById(id);
     }
-
 
     private DynamicRuleDto mapToDto(DynamicRule entity) {
         try {
@@ -83,7 +108,9 @@ public class DynamicRuleService {
                     queries
             );
         } catch (JacksonException e) {
-            throw new RuntimeException("Ошибка при чтении условий из JSON", e);
+            throw new InvalidDynamicRuleException(
+                    "Cannot read conditions from JSON", e
+            );
         }
     }
 }
