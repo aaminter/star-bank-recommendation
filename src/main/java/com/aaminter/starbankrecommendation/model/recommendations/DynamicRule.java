@@ -31,9 +31,20 @@ public class DynamicRule {
     @Column(name = "rule", columnDefinition = "jsonb", nullable = false)
     private String rule;
 
+    /**
+     * Required by JPA for entity instantiation.
+     */
     public DynamicRule() {
     }
 
+    /**
+     * Creates a dynamic rule entity with its product data and serialized conditions.
+     *
+     * @param productId product UUID
+     * @param productName product display name
+     * @param productText recommendation text
+     * @param rule serialized dynamic-rule conditions
+     */
     public DynamicRule(UUID productId, String productName, String productText, String rule) {
         this.productId = productId;
         this.productName = productName;
