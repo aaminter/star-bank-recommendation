@@ -6,10 +6,17 @@ import com.aaminter.starbankrecommendation.model.TelegramUser;
 import java.util.List;
 
 /**
- * Formats recommendation responses for Telegram.
+ * Formats customer recommendation data as a plain-text Telegram message.
  */
 public class TelegramMessageFormatter {
 
+    /**
+     * Builds a greeting followed by the supplied product recommendations.
+     *
+     * @param user customer whose first and last names appear in the greeting
+     * @param recommendations recommendations to include in the message
+     * @return formatted Telegram message text
+     */
     public String format(
             TelegramUser user,
             List<RecommendationDto> recommendations
