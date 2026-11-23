@@ -19,9 +19,20 @@ Writing dynamic configuration into the supplied H2 database would mix operationa
    - Benefit: isolates application-managed configuration and allows independent schema migrations.
    - Drawback: adds a datasource, credentials, migrations, and operational setup.
 
-## Proposed decision
+## Accepted decision
 
-Keep the supplied H2 datasource read-only and use a separate PostgreSQL datasource for dynamic rule definitions. Existing fixed rules and H2-backed transaction/product reads remain unchanged.
+Keep the supplied H2 datasource read-only and use a separate PostgreSQL datasource for dynamic rule definitions and rule statistics. Existing fixed rules and H2-backed transaction/product reads remain unchanged.
+
+The application configures the H2 connection with `spring.datasource.hikari.read-only=true` and a file JDBC URL containing `ACCESS_MODE_DATA=r;IFEXISTS=TRUE`. Dynamic-rule JPA repositories use the dedicated `recommendationsDataSource`, `recommendationsEntityManagerFactory`, and `recommendationsTransactionManager`. Liquibase is configured against the PostgreSQL datasource.
+
+## Current implementation and verification
+
+- `application.properties` configures the source H2 datasource as read-only and points it to an existing database file; the default URL does not create a missing source database.
+- `DataSourceConfig` creates a separate datasource from `custom.datasource.recommendations` properties.
+- `RecommendationsJpaConfig` binds the dynamic-rule repositories and their transaction manager to that PostgreSQL datasource.
+- Liquibase uses the PostgreSQL JDBC URL and credentials.
+- `DynamicRuleIntegrationTest` exercises rule creation, retrieval, deletion, and statistics through the application and checks the PostgreSQL repository state.
+- The integration test overrides `spring.datasource.hikari.read-only=false` and creates/populates H2 tables as test fixtures. It therefore does not prove that writes through the production H2 datasource configuration are rejected. No dedicated negative test for H2 write protection was found in the reviewed test sources.
 
 ## Consequences
 
@@ -36,6 +47,6 @@ Keep the supplied H2 datasource read-only and use a separate PostgreSQL datasour
 - Integration tests must prove that dynamic CRUD does not write to H2.
 
 ### Follow-up
-- [ ] Document datasource properties and ownership.
-- [ ] Add integration tests for PostgreSQL CRUD.
-- [ ] Add a test proving the H2 source remains read-only.
+- [x] Document datasource properties and ownership in `application.properties` and `docs/deployment.md`.
+- [x] Add integration coverage for PostgreSQL CRUD and rule statistics.
+- [ ] Add a dedicated test proving that writes through the production-configured H2 datasource are rejected, without disabling read-only mode for that test.
