@@ -91,7 +91,7 @@ paths:
                       properties:
                         rule_id:
                           type: string
-                          description: Database ID of the dynamic rule, serialized as a string
+                          description: Decimal string representation of the dynamic rule database ID (Long/BIGINT), not the product UUID
                         count:
                           type: string
                           description: Hit count serialized as a string
