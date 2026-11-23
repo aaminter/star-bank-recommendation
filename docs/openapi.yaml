@@ -26,6 +26,11 @@ paths:
   /rule:
     post:
       summary: Create a dynamic rule
+      description: >-
+        All conditions in the rule are combined using logical AND. The negate
+        flag inverts an individual condition before the AND composition is
+        evaluated. At least one condition is required; OR and nested condition
+        groups are not supported.
       requestBody:
         required: true
         content:
@@ -165,6 +170,10 @@ components:
             $ref: '#/components/schemas/RuleCondition'
     RuleCondition:
       type: object
+      description: >-
+        One condition in a dynamic rule. Conditions are combined using AND.
+        When negate is true, the result of this condition is inverted before
+        the combined result is evaluated.
       required: [query, arguments, negate]
       properties:
         query:
@@ -176,7 +185,14 @@ components:
             - TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW
         arguments:
           type: array
+          description: >-
+            Positional arguments depend on query: USER_OF and ACTIVE_USER_OF
+            take [productType]; TRANSACTION_SUM_COMPARE takes
+            [productType, transactionType, operator, nonNegativeInteger];
+            TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW takes
+            [productType, operator]. Supported operators are >, <, =, >=, <=.
           items:
             type: string
         negate:
           type: boolean
+          description: Invert this condition's result before applying AND composition.
