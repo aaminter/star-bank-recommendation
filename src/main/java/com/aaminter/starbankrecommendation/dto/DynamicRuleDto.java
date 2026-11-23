@@ -12,6 +12,10 @@ import java.util.UUID;
  * Request and response representation of a dynamic recommendation rule.
  * Validation constraints define the required product fields and conditions.
  */
+/**
+ * Request and response representation of a dynamic recommendation rule.
+ * Validation constraints define the required product fields and conditions.
+ */
 public record DynamicRuleDto(
         Long id,
 
