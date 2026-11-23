@@ -1,6 +1,6 @@
 # ADR-002: Define composition and negation semantics for dynamic rule conditions
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-31
 - Participants: Project contributors; pending confirmation in Pull Request
 
