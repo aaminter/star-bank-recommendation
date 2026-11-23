@@ -6,6 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Applies the static eligibility rule for the Top Saving recommendation.
+ *
+ * <p>The recommendation is offered to customers who have a debit product,
+ * whose debit or saving deposits are at least 50,000, and whose debit deposits
+ * exceed debit withdrawals.</p>
+ */
 @Component
 public class TopSavingRuleSet implements RecommendationRuleSet {
 
@@ -28,6 +35,12 @@ public class TopSavingRuleSet implements RecommendationRuleSet {
             Начните использовать «Копилку» уже сегодня и станьте ближе к своим финансовым целям!
             """;
 
+    /**
+     * Checks whether the customer meets the Top Saving eligibility conditions.
+     *
+     * @param metrics aggregated metrics of the customer
+     * @return the Top Saving recommendation when all conditions match; otherwise empty
+     */
     @Override
     public Optional<RecommendationDto> check(CustomerMetrics metrics) {
         boolean hasEnoughDeposits =
