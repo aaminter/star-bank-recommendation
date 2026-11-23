@@ -20,9 +20,11 @@ Dynamic rules may contain more than one condition. The evaluator needs determini
    - Benefit: flexible rule expressions.
    - Drawback: increases schema and evaluator complexity.
 
-## Proposed decision
+## Accepted decision
 
 For the first version, treat the condition list as AND: every condition must evaluate to true. Add a boolean `negate` flag to an individual condition; when true, invert that condition's result before applying the AND composition.
+
+An empty condition list is invalid and must be rejected by dynamic-rule validation before persistence. As a defensive measure, the evaluator also returns `false` when it receives an empty condition list.
 
 This is a first-version decision, not a claim that arbitrary nested boolean expressions are supported.
 
@@ -39,5 +41,5 @@ This is a first-version decision, not a claim that arbitrary nested boolean expr
 
 ### Follow-up
 - [ ] Add examples to the API contract.
-- [ ] Test empty condition lists, one condition, multiple conditions, negate true/false, and mixed results.
-- [ ] Decide explicitly whether an empty list is invalid or matches by identity.
+- [x] Test empty condition lists, one condition, multiple conditions, negate true/false, and mixed results.
+- [x] Decide explicitly that an empty list is invalid and does not match.
