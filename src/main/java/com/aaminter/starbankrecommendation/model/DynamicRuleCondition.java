@@ -3,6 +3,9 @@ package com.aaminter.starbankrecommendation.model;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable condition used by the dynamic rule evaluation engine.
+ */
 public record DynamicRuleCondition(
         String query,
         List<String> arguments,
