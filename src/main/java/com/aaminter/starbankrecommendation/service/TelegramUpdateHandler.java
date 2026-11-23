@@ -5,6 +5,7 @@ import com.aaminter.starbankrecommendation.model.TelegramUser;
 import com.aaminter.starbankrecommendation.repository.TelegramUserRepository;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -57,6 +58,11 @@ public class TelegramUpdateHandler implements UpdatesListener {
 
             if (message == null || message.chat() == null
                     || message.chat().id() == null || message.text() == null) {
+                continue;
+            }
+
+            // Recommendation data must never be posted to group chats.
+            if (message.chat().type() != Chat.Type.Private) {
                 continue;
             }
 

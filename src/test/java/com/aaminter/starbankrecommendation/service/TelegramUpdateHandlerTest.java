@@ -118,6 +118,16 @@ class TelegramUpdateHandlerTest {
     }
 
     @Test
+    void ignoresGroupChatsEvenWhenSenderIsAllowlisted() {
+        handler(Set.of(123L)).process(
+                List.of(createUpdate("/recommend ivan123", 123L, "group"))
+        );
+
+        verifyNoInteractions(userRepository, recommendationService);
+        verifyNoInteractions(bot);
+    }
+
+    @Test
     void welcomesChatOnlyOnceAndIgnoresUnrelatedMessages() {
         TelegramUpdateHandler handler = handler(Set.of(123L));
 
@@ -129,6 +139,10 @@ class TelegramUpdateHandlerTest {
     }
 
     private Update createUpdate(String text, Long senderId) {
+        return createUpdate(text, senderId, "private");
+    }
+
+    private Update createUpdate(String text, Long senderId, String chatType) {
         Update update = mock(Update.class);
         Message message = mock(Message.class);
         Chat chat = mock(Chat.class);
@@ -137,6 +151,9 @@ class TelegramUpdateHandlerTest {
         when(update.message()).thenReturn(message);
         when(message.chat()).thenReturn(chat);
         when(chat.id()).thenReturn(555L);
+        when(chat.type()).thenReturn(
+                "private".equals(chatType) ? Chat.Type.Private : Chat.Type.group
+        );
         when(message.from()).thenReturn(sender);
         when(sender.id()).thenReturn(senderId);
         when(message.text()).thenReturn(text);
