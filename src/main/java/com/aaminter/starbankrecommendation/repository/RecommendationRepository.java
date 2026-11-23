@@ -3,7 +3,7 @@ package com.aaminter.starbankrecommendation.repository;
 import com.aaminter.starbankrecommendation.model.CustomerMetrics;
 import com.aaminter.starbankrecommendation.model.ProductType;
 import com.aaminter.starbankrecommendation.model.ProductTypeMetrics;
-import com.aaminter.starbankrecommendation.repository.*;
+import com.aaminter.starbankrecommendation.service.cache.CacheClearable;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Repository
-public class RecommendationRepository {
+public class RecommendationRepository implements CacheClearable {
 
     private static final String FIND_CUSTOMER_METRICS_SQL = """
             SELECT
@@ -140,6 +140,7 @@ public class RecommendationRepository {
                 .orElseGet(CustomerMetrics::empty);
     }
 
+    @Override
     public void clearCache() {
         customerMetricsCache.invalidateAll();
     }
