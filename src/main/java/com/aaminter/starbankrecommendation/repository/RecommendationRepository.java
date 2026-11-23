@@ -6,6 +6,7 @@ import com.aaminter.starbankrecommendation.model.ProductTypeMetrics;
 import com.aaminter.starbankrecommendation.service.cache.CacheClearable;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -75,11 +76,7 @@ public class RecommendationRepository implements CacheClearable {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final Cache<UUID, CustomerMetrics> customerMetricsCache =
-            Caffeine.newBuilder()
-                    .maximumSize(10_000)
-                    .expireAfterWrite(Duration.ofMinutes(10))
-                    .build();
+    private final Cache<UUID, CustomerMetrics> customerMetricsCache;
 
     /**
      * Creates the repository using the JDBC template for source database queries.
@@ -87,7 +84,22 @@ public class RecommendationRepository implements CacheClearable {
      * @param jdbcTemplate JDBC access to the source customer database
      */
     public RecommendationRepository(JdbcTemplate jdbcTemplate) {
+        this(jdbcTemplate, Ticker.systemTicker());
+    }
+
+    /**
+     * Creates the repository with a configurable ticker for deterministic cache tests.
+     *
+     * @param jdbcTemplate JDBC access to the source customer database
+     * @param ticker time source used by the local cache
+     */
+    RecommendationRepository(JdbcTemplate jdbcTemplate, Ticker ticker) {
         this.jdbcTemplate = jdbcTemplate;
+        this.customerMetricsCache = Caffeine.newBuilder()
+                .maximumSize(10_000)
+                .expireAfterWrite(Duration.ofMinutes(10))
+                .ticker(ticker)
+                .build();
     }
 
     /**
