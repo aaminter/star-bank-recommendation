@@ -13,6 +13,22 @@ jobs:
   build:
     name: Build and test (Java 17)
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: star_bank_db
+          POSTGRES_USER: rec_db_user
+          POSTGRES_PASSWORD: recpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,4 +39,8 @@ jobs:
           java-version: "17"
           cache: maven
       - name: Verify
+        env:
+          REC_DB_URL: jdbc:postgresql://localhost:5432/star_bank_db
+          REC_DB_USERNAME: rec_db_user
+          REC_DB_PASSWORD: recpassword
         run: mvn --batch-mode --no-transfer-progress clean verify
