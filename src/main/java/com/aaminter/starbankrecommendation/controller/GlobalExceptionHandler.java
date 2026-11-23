@@ -39,6 +39,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidRule(IllegalArgumentException ex) {
+        Map<String, Object> response = Map.of(
+                "status", HttpStatus.BAD_REQUEST.value(),
+                "error", "Invalid rule",
+                "details", ex.getMessage() != null
+                        ? ex.getMessage()
+                        : "Проверьте тип условия и его аргументы"
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleEntityNotFound(EntityNotFoundException ex) {
         String message = ex.getMessage() != null ? ex.getMessage() : "Запись не найдена";
