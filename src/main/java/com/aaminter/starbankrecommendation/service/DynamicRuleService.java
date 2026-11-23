@@ -1,4 +1,3 @@
-
 package com.aaminter.starbankrecommendation.service;
 
 import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
@@ -36,6 +35,9 @@ public class DynamicRuleService {
 
     @Transactional("recommendationsTransactionManager")
     public DynamicRuleDto createRule(DynamicRuleDto dto) {
+        // Reject unsupported queries and malformed arguments before persistence.
+        DynamicRuleValidator.validate(dto.rule());
+
         try {
             String rulesJson = objectMapper.writeValueAsString(dto.rule());
 
