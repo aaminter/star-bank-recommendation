@@ -16,10 +16,20 @@ public class ManagementInfoController {
 
     private final BuildProperties buildProperties;
 
+    /**
+     * Creates the controller with build metadata supplied by Spring Boot.
+     *
+     * @param buildProperties generated build properties for the application
+     */
     public ManagementInfoController(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
 
+    /**
+     * Returns the application artifact name and version.
+     *
+     * @return map containing the {@code name} and {@code version} entries
+     */
     @GetMapping("/info")
     public Map<String, String> getInfo() {
         return Map.of(
