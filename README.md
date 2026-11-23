@@ -25,6 +25,8 @@
 - [Требования, User Stories и трассировка Issues](docs/requirements.md)
 - [Развёртывание и конфигурация](docs/deployment.md)
 - [Спецификация OpenAPI](docs/openapi.yaml)
+- [Портфолио: Case Study](docs/portfolio/case-study.md)
+- [Ретроспектива командной разработки](docs/retrospective.md)
 
 ## REST API
 
@@ -66,4 +68,4 @@ java -jar target/star-bank-recommendation-0.0.1-SNAPSHOT.jar
 
 ## Статус проекта
 
-Учебный проект, не production-система. Реализованные возможности подтверждаются кодом, тестами, Pull Requests и историей GitHub Issues. Последняя проверенная сборка PR #30: 70 тестов, 0 ошибок, `BUILD SUCCESS`.
+Учебный проект, не production-система. Реализованные возможности подтверждаются кодом, тестами, Pull Requests и историей GitHub Issues. В PR #33 зафиксирована проверка на 71 тест: 0 ошибок, 0 провалов, 2 пропущены; GitHub Actions завершился успешно.
