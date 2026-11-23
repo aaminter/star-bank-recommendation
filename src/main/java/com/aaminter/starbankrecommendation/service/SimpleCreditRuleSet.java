@@ -6,6 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Applies the static eligibility rule for the Simple Credit recommendation.
+ *
+ * <p>The recommendation is offered when the customer has no credit product,
+ * debit deposits exceed debit withdrawals, and debit withdrawals exceed
+ * 100,000.</p>
+ */
 @Component
 public class SimpleCreditRuleSet implements RecommendationRuleSet {
 
@@ -30,6 +37,12 @@ public class SimpleCreditRuleSet implements RecommendationRuleSet {
             Не упустите возможность воспользоваться выгодными условиями кредитования от нашей компании!
             """;
 
+    /**
+     * Checks whether the customer meets the Simple Credit eligibility conditions.
+     *
+     * @param metrics aggregated metrics of the customer
+     * @return the Simple Credit recommendation when all conditions match; otherwise empty
+     */
     @Override
     public Optional<RecommendationDto> check(CustomerMetrics metrics) {
         boolean depositsExceedWithdrawals =
