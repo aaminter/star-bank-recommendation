@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-31
-- Participants: Project contributors; pending confirmation in Pull Request
+- Participants: `aaminter`, `tani9kuz-lang`; agreement recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
 
 ## Context
 
@@ -22,7 +22,7 @@ The recommendation flow may repeatedly read and evaluate the same dynamic rule d
 
 ## Proposed decision
 
-Evaluate Caffeine as the first cache implementation, provided the application remains a single-instance educational service. Cache only data whose invalidation behavior is defined. Successful create, update, and delete operations must invalidate or refresh the affected cache entry before the updated rule set is used by subsequent requests.
+Use Caffeine as the first cache implementation for this single-instance educational service. Cache only data whose invalidation behavior is defined. Successful create, update, and delete operations must invalidate or refresh the affected cache entry before the updated rule set is used by subsequent requests.
 
 Do not introduce distributed caching without a measured need.
 
@@ -38,7 +38,6 @@ Do not introduce distributed caching without a measured need.
 - Cache behavior must be covered by deterministic tests.
 
 ### Follow-up
-- [ ] Confirm whether the first release targets a single application instance.
 - [ ] Agree cache key and value model.
 - [ ] Define TTL and maximum size.
 - [ ] Test invalidation after create, update, and delete.
