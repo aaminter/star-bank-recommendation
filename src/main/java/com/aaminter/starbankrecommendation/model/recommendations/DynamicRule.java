@@ -6,6 +6,10 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
+/**
+ * JPA entity representing a persisted dynamic recommendation rule.
+ * The rule conditions are stored as JSONB in the recommendation database.
+ */
 @Entity
 @Table(name = "dynamic_rules")
 public class DynamicRule {
