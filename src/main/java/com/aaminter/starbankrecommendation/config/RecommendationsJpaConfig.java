@@ -51,6 +51,12 @@ public class RecommendationsJpaConfig {
                 .build();
     }
 
+    /**
+     * Creates the transaction manager for the recommendation persistence unit.
+     *
+     * @param entityManagerFactory recommendation entity manager factory
+     * @return transaction manager for recommendation database operations
+     */
     @Bean(name = "recommendationsTransactionManager")
     public PlatformTransactionManager recommendationsTransactionManager(
             @Qualifier("recommendationsEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
