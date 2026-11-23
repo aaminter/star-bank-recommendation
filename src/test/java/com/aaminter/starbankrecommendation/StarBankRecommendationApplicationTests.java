@@ -137,7 +137,7 @@ class StarBankRecommendationApplicationTests {
         var refreshed = recommendationRepository.getCustomerMetrics(USER_ID);
         assertEquals(
                 6_000,
-                refreshed.forProduct(com.aaminter.starbankrecommendation.model.ProductType.DEBIT)
+                refreshed.forProduct(ProductType.DEBIT)
                         .depositSum().longValue()
         );
     }
