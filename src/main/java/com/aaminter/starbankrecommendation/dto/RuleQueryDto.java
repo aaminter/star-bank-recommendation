@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * One condition in a dynamic rule, including its query arguments and negation flag.
+ */
 public record RuleQueryDto(
         @NotBlank(message = "Поле query не может быть пустым")
         String query,
