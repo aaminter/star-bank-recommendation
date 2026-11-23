@@ -16,6 +16,13 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Creates, retrieves and deletes dynamic recommendation rules stored in PostgreSQL.
+ *
+ * <p>Rule conditions are persisted as JSON. Invalid stored JSON is skipped when
+ * rules are retrieved, so one malformed record does not prevent other rules
+ * from being returned.</p>
+ */
 @Service
 public class DynamicRuleService {
 
@@ -25,6 +32,12 @@ public class DynamicRuleService {
     private final DynamicRuleRepository repository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Creates the service with the dynamic rule repository and JSON mapper.
+     *
+     * @param repository repository for persisted dynamic rules
+     * @param objectMapper mapper used to serialize and deserialize rule conditions
+     */
     public DynamicRuleService(
             DynamicRuleRepository repository,
             ObjectMapper objectMapper
@@ -33,6 +46,13 @@ public class DynamicRuleService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Validates and persists a dynamic rule.
+     *
+     * @param dto rule data, including product information and conditions
+     * @return the persisted rule with its generated database identifier
+     * @throws IllegalArgumentException if a condition type or its arguments are invalid
+     */
     @Transactional("recommendationsTransactionManager")
     public DynamicRuleDto createRule(DynamicRuleDto dto) {
         // Reject unsupported queries and malformed arguments before persistence.
@@ -64,6 +84,14 @@ public class DynamicRuleService {
         }
     }
 
+    /**
+     * Loads all stored rules and converts valid records to DTOs.
+     *
+     * <p>Records whose condition JSON cannot be deserialized are logged and
+     * omitted from the returned list.</p>
+     *
+     * @return all successfully deserialized dynamic rules
+     */
     @Transactional(value = "recommendationsTransactionManager", readOnly = true)
     public List<DynamicRuleDto> getAllRules() {
         List<DynamicRuleDto> rules = new ArrayList<>();
@@ -83,6 +111,12 @@ public class DynamicRuleService {
         return rules;
     }
 
+    /**
+     * Deletes a dynamic rule by its database identifier.
+     *
+     * @param id Long identifier of the dynamic rule record
+     * @throws EntityNotFoundException if no rule with the identifier exists
+     */
     @Transactional("recommendationsTransactionManager")
     public void deleteRule(Long id) {
         if (!repository.existsById(id)) {
