@@ -32,7 +32,8 @@ The application configures the H2 connection with `spring.datasource.hikari.read
 - `RecommendationsJpaConfig` binds the dynamic-rule repositories and their transaction manager to that PostgreSQL datasource.
 - Liquibase uses the PostgreSQL JDBC URL and credentials.
 - `DynamicRuleIntegrationTest` exercises rule creation, retrieval, deletion, and statistics through the application and checks the PostgreSQL repository state.
-- The integration test overrides `spring.datasource.hikari.read-only=false` and creates/populates H2 tables as test fixtures. It therefore does not prove that writes through the production H2 datasource configuration are rejected. No dedicated negative test for H2 write protection was found in the reviewed test sources.
+- The integration test overrides `spring.datasource.hikari.read-only=false` and creates/populates H2 tables as test fixtures. It therefore does not prove that writes through the application-bound H2 datasource are rejected.
+- `SourceDataSourceReadOnlyTest` separately verifies the write-protection mechanism: it prepares a temporary H2 database, reconnects using `ACCESS_MODE_DATA=r;IFEXISTS=TRUE` and a Hikari datasource with `readOnly=true`, attempts an `INSERT`, expects a `DataAccessException`, and verifies that no row was written. This test verifies the read-only JDBC URL and Hikari setting together; it does not load the application's Spring datasource properties or prove their binding.
 
 ## Consequences
 
@@ -49,4 +50,4 @@ The application configures the H2 connection with `spring.datasource.hikari.read
 ### Follow-up
 - [x] Document datasource properties and ownership in `application.properties` and `docs/deployment.md`.
 - [x] Add integration coverage for PostgreSQL CRUD and rule statistics.
-- [ ] Add a dedicated test proving that writes through the production-configured H2 datasource are rejected, without disabling read-only mode for that test.
+- [x] Add a dedicated negative test verifying that H2 rejects writes when connected with the read-only JDBC URL and Hikari `readOnly=true`; the test is isolated from Spring property binding.
