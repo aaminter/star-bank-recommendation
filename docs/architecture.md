@@ -32,8 +32,8 @@ flowchart LR
         BuildInfo[BuildProperties]
     end
 
-    User -->|GET /recommendation/{user_id}| RC
-    Manager -->|POST /rule, GET /rule, DELETE /rule/{id}| DC
+    User -->|GET /recommendation/&#123;user_id&#125;| RC
+    Manager -->|POST /rule, GET /rule, DELETE /rule/&#123;id&#125;| DC
     Manager -->|GET /rule/stats| DC
     Manager -->|POST /management/clear-caches| MC
     Manager -->|GET /management/info| IC
@@ -60,7 +60,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    A([GET /recommendation/{user_id}]) --> B[Load customer metrics]
+    A([GET /recommendation/&#123;user_id&#125;]) --> B[Load customer metrics]
     B --> C{Metrics in Caffeine cache?}
     C -->|Yes| D[Use cached metrics]
     C -->|No| E[Read aggregates from H2]
