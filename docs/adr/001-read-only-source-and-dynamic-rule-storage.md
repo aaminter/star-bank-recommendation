@@ -1,6 +1,6 @@
 # ADR-001: Keep source transactions read-only and store dynamic rules separately
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-31
 - Participants: Project contributors; pending confirmation in Pull Request
 
