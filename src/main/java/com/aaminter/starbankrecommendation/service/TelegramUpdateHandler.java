@@ -16,9 +16,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Handles the Telegram bot's single supported recommendation command.
+ * Handles incoming Telegram updates for the recommendation bot.
  *
- * Access is restricted to explicitly configured Telegram operator IDs.
+ * <p>Only private chats are processed. Recommendation requests are restricted
+ * to explicitly configured Telegram operator IDs.</p>
  */
 public class TelegramUpdateHandler implements UpdatesListener {
 
@@ -37,6 +38,15 @@ public class TelegramUpdateHandler implements UpdatesListener {
     private final Set<Long> allowedTelegramUserIds;
     private final Set<Long> welcomedChats = ConcurrentHashMap.newKeySet();
 
+    /**
+     * Creates the update handler with the bot, lookup services and access list.
+     *
+     * @param bot Telegram bot used to send replies
+     * @param userRepository repository used to find source-system customers
+     * @param recommendationService service generating customer recommendations
+     * @param messageFormatter formatter for Telegram recommendation messages
+     * @param allowedTelegramUserIds Telegram sender IDs permitted to request recommendations
+     */
     public TelegramUpdateHandler(
             TelegramBot bot,
             TelegramUserRepository userRepository,
@@ -51,6 +61,16 @@ public class TelegramUpdateHandler implements UpdatesListener {
         this.allowedTelegramUserIds = Set.copyOf(allowedTelegramUserIds);
     }
 
+    /**
+     * Processes a batch of Telegram updates.
+     *
+     * <p>Malformed updates and non-private chats are ignored. Each private chat
+     * receives the welcome message once per handler instance; valid messages
+     * are then delegated to the command handler.</p>
+     *
+     * @param updates batch of updates received from Telegram
+     * @return {@link #CONFIRMED_UPDATES_ALL} after the batch has been processed
+     */
     @Override
     public int process(List<Update> updates) {
         for (Update update : updates) {
