@@ -15,6 +15,10 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configures JPA repositories, entity management, and transactions for the
+ * dedicated recommendation database.
+ */
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
@@ -24,6 +28,13 @@ import java.util.Map;
 )
 public class RecommendationsJpaConfig {
 
+    /**
+     * Creates the entity manager factory for recommendation entities.
+     *
+     * @param builder Spring Boot entity manager factory builder
+     * @param dataSource dedicated recommendation database data source
+     * @return configured entity manager factory bean
+     */
     @Bean(name = "recommendationsEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean recommendationsEntityManagerFactory(
             EntityManagerFactoryBuilder builder,
