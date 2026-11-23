@@ -8,9 +8,10 @@
 
 ```mermaid
 flowchart LR
-    User[User]
-    Manager[Manager]
-    TelegramPlatform[Telegram Platform]
+    User[Пользователь]
+    Manager[Менеджер]
+    External[Внешняя система]
+    TelegramPlatform[Telegram Bot API]
     H2[(H2 source DB<br/>read-only)]
     PostgreSQL[(PostgreSQL<br/>rules and stats)]
 
@@ -33,11 +34,12 @@ flowchart LR
     end
 
     User -->|GET recommendations by user ID| RC
-    Manager -->|POST rule, GET rules, DELETE rule by ID| DC
-    Manager -->|GET rule stats| DC
-    Manager -->|POST clear caches| MC
-    Manager -->|GET management info| IC
+    User -->|/recommend username via bot| TelegramPlatform
     TelegramPlatform <-->|Updates / SendMessage| TH
+    Manager -->|POST/GET/DELETE rules| DC
+    Manager -->|GET rule stats| DC
+    External -->|POST clear caches| MC
+    External -->|GET application info| IC
     RC --> RS
     TH --> UserRepo
     TH --> RS
