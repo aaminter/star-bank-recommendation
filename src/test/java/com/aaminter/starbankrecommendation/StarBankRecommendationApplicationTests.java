@@ -20,6 +20,8 @@ import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,6 +113,32 @@ class StarBankRecommendationApplicationTests {
 
         // Очищаем кеш после подготовки новой тестовой БД.
         recommendationRepository.clearCache();
+    }
+
+    @Test
+    void shouldClearCustomerMetricsCacheThroughManagementEndpoint()
+            throws Exception {
+
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 1_000);
+
+        var cached = recommendationRepository.getCustomerMetrics(USER_ID);
+        assertEquals(
+                1_000,
+                cached.forProduct(com.aaminter.starbankrecommendation.model.ProductType.DEBIT)
+                        .depositSum().longValue()
+        );
+
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 5_000);
+
+        mockMvc.perform(post("/management/clear-caches"))
+                .andExpect(status().isNoContent());
+
+        var refreshed = recommendationRepository.getCustomerMetrics(USER_ID);
+        assertEquals(
+                6_000,
+                refreshed.forProduct(com.aaminter.starbankrecommendation.model.ProductType.DEBIT)
+                        .depositSum().longValue()
+        );
     }
 
     @Test
