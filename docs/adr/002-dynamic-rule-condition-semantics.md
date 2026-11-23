@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-31
-- Participants: Project contributors; pending confirmation in Pull Request
+- Participants: `aaminter`, `tani9kuz-lang`; agreement recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
 
 ## Context
 
@@ -24,7 +24,7 @@ Dynamic rules may contain more than one condition. The evaluator needs determini
 
 For the first version, treat the condition list as AND: every condition must evaluate to true. Add a boolean `negate` flag to an individual condition; when true, invert that condition's result before applying the AND composition.
 
-This is a first-version proposal, not a claim that arbitrary nested boolean expressions are supported.
+This is a first-version decision, not a claim that arbitrary nested boolean expressions are supported.
 
 ## Consequences
 
@@ -38,7 +38,6 @@ This is a first-version proposal, not a claim that arbitrary nested boolean expr
 - A future schema extension may be required if business rules need more complex logic.
 
 ### Follow-up
-- [ ] Confirm the contract with the CRUD module owner.
 - [ ] Add examples to the API contract.
 - [ ] Test empty condition lists, one condition, multiple conditions, negate true/false, and mixed results.
 - [ ] Decide explicitly whether an empty list is invalid or matches by identity.

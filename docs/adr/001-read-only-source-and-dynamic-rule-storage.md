@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-31
-- Participants: Project contributors; pending confirmation in Pull Request
+- Participants: `aaminter`, `tani9kuz-lang`; agreement recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
 
 ## Context
 
@@ -36,7 +36,6 @@ Keep the supplied H2 datasource read-only and use a separate PostgreSQL datasour
 - Integration tests must prove that dynamic CRUD does not write to H2.
 
 ### Follow-up
-- [ ] Confirm the decision with all contributors.
 - [ ] Document datasource properties and ownership.
 - [ ] Add integration tests for PostgreSQL CRUD.
 - [ ] Add a test proving the H2 source remains read-only.
