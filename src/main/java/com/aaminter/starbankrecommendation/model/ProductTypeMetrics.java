@@ -2,6 +2,9 @@ package com.aaminter.starbankrecommendation.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Transaction metrics aggregated for a single product type.
+ */
 public record ProductTypeMetrics(
         long transactionCount,
         BigDecimal depositSum,
@@ -15,6 +18,11 @@ public record ProductTypeMetrics(
         }
     }
 
+    /**
+     * Creates zero-valued transaction metrics.
+     *
+     * @return empty product type metrics
+     */
     public static ProductTypeMetrics empty() {
         return new ProductTypeMetrics(
                 0,
@@ -23,6 +31,12 @@ public record ProductTypeMetrics(
         );
     }
 
+    /**
+     * Returns the aggregate amount for the specified transaction type.
+     *
+     * @param type transaction type
+     * @return deposit or withdrawal sum
+     */
     public BigDecimal sum(TransactionType type) {
         return switch (type) {
             case DEPOSIT -> depositSum;
