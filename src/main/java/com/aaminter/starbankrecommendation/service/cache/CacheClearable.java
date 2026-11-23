@@ -5,5 +5,8 @@ package com.aaminter.starbankrecommendation.service.cache;
  */
 public interface CacheClearable {
 
+    /**
+     * Invalidates all entries held by the implementing component's cache.
+     */
     void clearCache();
 }
