@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * JPA entity storing the number of times a dynamic rule has been triggered.
+ */
 @Entity
 @Table(name = "dynamic_rule_stats")
 public class RuleStats {
