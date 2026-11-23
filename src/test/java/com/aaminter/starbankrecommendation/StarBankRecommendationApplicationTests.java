@@ -1,6 +1,7 @@
 
 package com.aaminter.starbankrecommendation;
 
+import com.aaminter.starbankrecommendation.model.ProductType;
 import com.aaminter.starbankrecommendation.model.recommendations.DynamicRule;
 import com.aaminter.starbankrecommendation.repository.RecommendationRepository;
 import com.aaminter.starbankrecommendation.repository.recommendations.DynamicRuleRepository;
@@ -124,7 +125,7 @@ class StarBankRecommendationApplicationTests {
         var cached = recommendationRepository.getCustomerMetrics(USER_ID);
         assertEquals(
                 1_000,
-                cached.forProduct(com.aaminter.starbankrecommendation.model.ProductType.DEBIT)
+                cached.forProduct(ProductType.DEBIT)
                         .depositSum().longValue()
         );
 
