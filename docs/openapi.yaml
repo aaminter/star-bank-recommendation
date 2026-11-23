@@ -37,6 +37,20 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DynamicRule'
+            examples:
+              multipleConditions:
+                summary: Multiple conditions combined with AND
+                value:
+                  product_name: Example credit
+                  product_id: 00000000-0000-0000-0000-000000000001
+                  product_text: Example recommendation text
+                  rule:
+                    - query: USER_OF
+                      arguments: [CREDIT]
+                      negate: false
+                    - query: TRANSACTION_SUM_COMPARE
+                      arguments: [DEBIT, DEPOSIT, ">=", "100000"]
+                      negate: true
       responses:
         '200':
           description: Created rule
