@@ -60,6 +60,11 @@ public class TelegramUpdateHandler implements UpdatesListener {
                 continue;
             }
 
+            // Recommendation data must never be posted to group chats.
+            if (!"private".equals(message.chat().type())) {
+                continue;
+            }
+
             Long chatId = message.chat().id();
 
             if (welcomedChats.add(chatId)) {
