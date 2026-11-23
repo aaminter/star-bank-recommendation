@@ -9,9 +9,20 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Persists and queries execution statistics for dynamic recommendation rules.
+ *
+ * <p>Statistics are keyed by the dynamic rule's database identifier
+ * (Long/BIGINT), not by the product UUID.</p>
+ */
 @Repository
 public interface RuleStatsRepository extends JpaRepository<RuleStats, Long> {
 
+    /**
+     * Atomically creates a counter or increments the existing counter by one.
+     *
+     * @param ruleId database identifier of the dynamic rule
+     */
     @Modifying
     @Query(value = """
             INSERT INTO dynamic_rule_stats (rule_id, count)
@@ -21,6 +32,14 @@ public interface RuleStatsRepository extends JpaRepository<RuleStats, Long> {
             """, nativeQuery = true)
     void increment(@Param("ruleId") Long ruleId);
 
+    /**
+     * Returns a counter row for every dynamic rule, including rules not yet executed.
+     *
+     * <p>The left join preserves rules without a statistics record and
+     * {@code COALESCE} reports their count as zero.</p>
+     *
+     * @return rows containing the rule database identifier and its counter
+     */
     @Query(value = """
             SELECT r.id AS rule_id,
                    COALESCE(s.count, 0) AS count
