@@ -6,6 +6,10 @@ import java.util.Map;
  * Aggregated customer activity metrics used to evaluate recommendation rules.
  * The product metrics map is stored as an immutable snapshot.
  */
+/**
+ * Aggregated customer activity metrics used to evaluate recommendation rules.
+ * The product metrics map is stored as an immutable snapshot.
+ */
 public record CustomerMetrics(
         boolean hasDebit,
         boolean hasInvest,
@@ -47,6 +51,12 @@ public record CustomerMetrics(
      * @param type product type to look up
      * @return metrics for the product type
      */
+    /**
+     * Returns metrics for the requested product type, or zero-valued metrics when absent.
+     *
+     * @param type product type to look up
+     * @return metrics for the product type
+     */
     public ProductTypeMetrics forProduct(ProductType type) {
         return productMetrics.getOrDefault(
                 type,
@@ -54,6 +64,11 @@ public record CustomerMetrics(
         );
     }
 
+    /**
+     * Creates an instance with all metrics set to zero or false.
+     *
+     * @return empty customer metrics
+     */
     /**
      * Creates an instance with all metrics set to zero or false.
      *
