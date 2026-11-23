@@ -15,10 +15,20 @@ public class ManagementController {
 
     private final CacheManagementService cacheManagementService;
 
+    /**
+     * Creates the controller with the cache management service.
+     *
+     * @param cacheManagementService service coordinating cache invalidation
+     */
     public ManagementController(CacheManagementService cacheManagementService) {
         this.cacheManagementService = cacheManagementService;
     }
 
+    /**
+     * Invalidates all caches registered with the cache management service.
+     *
+     * @return {@code 204 No Content} after cache invalidation
+     */
     @PostMapping("/clear-caches")
     public ResponseEntity<Void> clearCaches() {
         cacheManagementService.clearAllCaches();
