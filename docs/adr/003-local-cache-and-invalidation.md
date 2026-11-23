@@ -1,6 +1,6 @@
 # ADR-003: Use a local cache for dynamic rule reads
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-31
 - Participants: Project contributors; pending confirmation in Pull Request
 
