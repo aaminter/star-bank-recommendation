@@ -46,7 +46,7 @@ class SourceDataSourceReadOnlyTest {
 
             assertThrows(DataAccessException.class, () ->
                     jdbcTemplate.update(
-                            "INSERT INTO SOURCE_DATA (ID, DATA_VALUE) DATA_VALUES (?, ?)",
+                            "INSERT INTO SOURCE_DATA (ID, DATA_VALUE) VALUES (?, ?)",
                             1L,
                             "must not be stored"
                     )
