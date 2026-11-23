@@ -31,7 +31,7 @@ class SourceDataSourceReadOnlyTest {
             statement.execute("""
                     CREATE TABLE SOURCE_DATA (
                         ID BIGINT PRIMARY KEY,
-                        VALUE VARCHAR(100)
+                        DATA_VALUE VARCHAR(100)
                     )
                     """);
         }
@@ -46,7 +46,7 @@ class SourceDataSourceReadOnlyTest {
 
             assertThrows(DataAccessException.class, () ->
                     jdbcTemplate.update(
-                            "INSERT INTO SOURCE_DATA (ID, VALUE) VALUES (?, ?)",
+                            "INSERT INTO SOURCE_DATA (ID, DATA_VALUE) DATA_VALUES (?, ?)",
                             1L,
                             "must not be stored"
                     )
