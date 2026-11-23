@@ -11,8 +11,8 @@ flowchart LR
     User[User]
     Manager[Manager]
     TelegramPlatform[Telegram Platform]
-    H2[(H2 source DB\nread-only)]
-    PostgreSQL[(PostgreSQL\nrules and stats)]
+    H2[(H2 source DB<br/>read-only)]
+    PostgreSQL[(PostgreSQL<br/>rules and stats)]
 
     subgraph App[Spring Boot application]
         RC[RecommendationController]
@@ -21,7 +21,7 @@ flowchart LR
         IC[ManagementInfoController]
         TH[TelegramUpdateHandler]
         RS[RecommendationService]
-        StaticRules[Static Rule Sets\nInvest 500 / Top Saving / Simple Credit]
+        StaticRules[Static Rule Sets<br/>Invest 500 / Top Saving / Simple Credit]
         DRService[DynamicRuleService]
         Engine[DynamicRuleEngine]
         Stats[RuleStatsService]
@@ -32,11 +32,11 @@ flowchart LR
         BuildInfo[BuildProperties]
     end
 
-    User -->|GET /recommendation/&#123;user_id&#125;| RC
-    Manager -->|POST /rule, GET /rule, DELETE /rule/&#123;id&#125;| DC
-    Manager -->|GET /rule/stats| DC
-    Manager -->|POST /management/clear-caches| MC
-    Manager -->|GET /management/info| IC
+    User -->|GET recommendations by user ID| RC
+    Manager -->|POST rule, GET rules, DELETE rule by ID| DC
+    Manager -->|GET rule stats| DC
+    Manager -->|POST clear caches| MC
+    Manager -->|GET management info| IC
     TelegramPlatform <-->|Updates / SendMessage| TH
     RC --> RS
     TH --> UserRepo
@@ -60,7 +60,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    A([GET /recommendation/&#123;user_id&#125;]) --> B[Load customer metrics]
+    A([Get recommendations for user ID]) --> B[Load customer metrics]
     B --> C{Metrics in Caffeine cache?}
     C -->|Yes| D[Use cached metrics]
     C -->|No| E[Read aggregates from H2]
