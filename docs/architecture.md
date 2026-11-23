@@ -73,7 +73,7 @@ flowchart TD
     J -->|No| R[Build RecommendationResponse]
     J -->|Yes| K[Evaluate each condition]
     K --> L[Apply negate to condition result]
-    L --> M{All conditions true (AND)?}
+    L --> M{Do all conditions match?}
     M -->|No| J
     M -->|Yes| N[Add dynamic recommendation]
     N --> O[Increment rule hit counter]
