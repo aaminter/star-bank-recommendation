@@ -26,7 +26,7 @@ Dynamic rule definitions are stored separately in PostgreSQL. Caching those defi
 
 Use Caffeine for local in-process caching. Keep the cache bounded and provide an application-level cache invalidation mechanism. Do not introduce distributed caching without a measured need.
 
-The original decision discussion also considered caching dynamic rule definitions and invalidating affected entries after rule changes. The current implementation does not cache dynamic rule definitions; that part of the originally discussed design has not been implemented.
+Dynamic rule definitions stored in PostgreSQL are intentionally not cached. The original discussion considered caching them, but the current read path loads the rule set from PostgreSQL directly. No measured performance need currently justifies a second cache and its mutation-invalidation requirements. This supersedes the earlier proposal to cache dynamic rule definitions. If profiling later identifies PostgreSQL rule reads as a bottleneck, caching can be reconsidered with explicit invalidation on every successful rule mutation.
 
 ## Current implementation
 
@@ -53,11 +53,11 @@ The implemented cache is owned by `RecommendationRepository` and stores aggregat
 - Each application instance has its own cache.
 - Cached customer metrics can remain stale for up to the configured expiry period unless the management endpoint is called.
 - Dynamic rule definitions are not cached, so each recommendation flow loads them from PostgreSQL.
-- The accepted design discussion about caching dynamic rule definitions is not fully reflected in the implementation.
+- Dynamic rule definitions are deliberately read from PostgreSQL on each retrieval; this avoids stale rule definitions and mutation-driven cache invalidation, at the cost of a database read.
 
 ## Follow-up
 
-- [ ] Decide whether dynamic rule definitions should be cached. If yes, implement cache ownership and invalidation on every rule mutation; if no, explicitly supersede that part of the original decision.
-- [ ] Add or retain tests proving customer-metrics cache expiry, reuse, and management-endpoint invalidation.
-- [ ] Document the operational procedure for invoking cache invalidation after source-data changes.
-- [ ] Revisit the local-cache decision if the application is deployed with multiple instances.
+- [x] Decide whether dynamic rule definitions should be cached. They are intentionally not cached unless profiling demonstrates a material performance need; this supersedes the earlier proposal to cache them.
+- [x] Add tests proving customer-metrics cache reuse, expiry, and invalidation through the management HTTP endpoint.
+- [x] Document the operational procedure for invoking cache invalidation after source-data changes in [deployment instructions](../deployment.md#управление-кешем).
+- [ ] Revisit the local-cache decision if the application is deployed with multiple instances. The cache is process-local, so each instance must be invalidated independently; distributed caching remains out of scope until there is a demonstrated need.
