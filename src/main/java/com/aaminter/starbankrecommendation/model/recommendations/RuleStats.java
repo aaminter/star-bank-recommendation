@@ -22,6 +22,12 @@ public class RuleStats {
     protected RuleStats() {
     }
 
+    /**
+     * Creates a statistics record for a dynamic rule.
+     *
+     * @param ruleId dynamic rule identifier
+     * @param count number of recorded triggers
+     */
     public RuleStats(Long ruleId, Long count) {
         this.ruleId = ruleId;
         this.count = count;
