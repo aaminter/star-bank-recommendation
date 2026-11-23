@@ -1,10 +1,18 @@
 package com.aaminter.starbankrecommendation.repository;
 
 import com.aaminter.starbankrecommendation.model.CustomerMetrics;
+import com.aaminter.starbankrecommendation.model.ProductType;
+import com.aaminter.starbankrecommendation.model.ProductTypeMetrics;
+import com.aaminter.starbankrecommendation.repository.*;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Repository
@@ -12,41 +20,46 @@ public class RecommendationRepository {
 
     private static final String FIND_CUSTOMER_METRICS_SQL = """
             SELECT
-                COUNT(CASE WHEN p.TYPE = 'DEBIT' THEN 1 END) > 0
-                    AS HAS_DEBIT,
+                COUNT(CASE WHEN p.TYPE = 'DEBIT' THEN 1 END)
+                    AS DEBIT_COUNT,
+                COUNT(CASE WHEN p.TYPE = 'CREDIT' THEN 1 END)
+                    AS CREDIT_COUNT,
+                COUNT(CASE WHEN p.TYPE = 'INVEST' THEN 1 END)
+                    AS INVEST_COUNT,
+                COUNT(CASE WHEN p.TYPE = 'SAVING' THEN 1 END)
+                    AS SAVING_COUNT,
 
-                COUNT(CASE WHEN p.TYPE = 'INVEST' THEN 1 END) > 0
-                    AS HAS_INVEST,
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'DEBIT' AND t.TYPE = 'DEPOSIT'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS DEBIT_DEPOSITS,
 
-                COUNT(CASE WHEN p.TYPE = 'CREDIT' THEN 1 END) > 0
-                    AS HAS_CREDIT,
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'DEBIT' AND t.TYPE = 'WITHDRAW'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS DEBIT_WITHDRAWALS,
 
-                COALESCE(SUM(
-                    CASE
-                        WHEN p.TYPE = 'SAVING'
-                         AND t.TYPE = 'DEPOSIT'
-                        THEN t.AMOUNT
-                        ELSE 0
-                    END
-                ), 0) AS SAVING_DEPOSITS,
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'CREDIT' AND t.TYPE = 'DEPOSIT'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS CREDIT_DEPOSITS,
 
-                COALESCE(SUM(
-                    CASE
-                        WHEN p.TYPE = 'DEBIT'
-                         AND t.TYPE = 'DEPOSIT'
-                        THEN t.AMOUNT
-                        ELSE 0
-                    END
-                ), 0) AS DEBIT_DEPOSITS,
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'CREDIT' AND t.TYPE = 'WITHDRAW'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS CREDIT_WITHDRAWALS,
 
-                COALESCE(SUM(
-                    CASE
-                        WHEN p.TYPE = 'DEBIT'
-                         AND t.TYPE = 'WITHDRAW'
-                        THEN t.AMOUNT
-                        ELSE 0
-                    END
-                ), 0) AS DEBIT_WITHDRAWALS
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'INVEST' AND t.TYPE = 'DEPOSIT'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS INVEST_DEPOSITS,
+
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'INVEST' AND t.TYPE = 'WITHDRAW'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS INVEST_WITHDRAWALS,
+
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'SAVING' AND t.TYPE = 'DEPOSIT'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS SAVING_DEPOSITS,
+
+                COALESCE(SUM(CASE
+                    WHEN p.TYPE = 'SAVING' AND t.TYPE = 'WITHDRAW'
+                    THEN t.AMOUNT ELSE 0 END), 0) AS SAVING_WITHDRAWALS
 
             FROM TRANSACTIONS t
             JOIN PRODUCTS p ON p.ID = t.PRODUCT_ID
@@ -55,26 +68,79 @@ public class RecommendationRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final Cache<UUID, CustomerMetrics> customerMetricsCache =
+            Caffeine.newBuilder()
+                    .maximumSize(10_000)
+                    .expireAfterWrite(Duration.ofMinutes(10))
+                    .build();
+
     public RecommendationRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public CustomerMetrics getCustomerMetrics(UUID userId) {
+        Objects.requireNonNull(userId, "userId must not be null");
+
+        return customerMetricsCache.get(
+                userId,
+                this::loadCustomerMetrics
+        );
+    }
+
+    private CustomerMetrics loadCustomerMetrics(UUID userId) {
         List<CustomerMetrics> results = jdbcTemplate.query(
                 FIND_CUSTOMER_METRICS_SQL,
-                (resultSet, rowNum) -> new CustomerMetrics(
-                        resultSet.getBoolean("HAS_DEBIT"),
-                        resultSet.getBoolean("HAS_INVEST"),
-                        resultSet.getBoolean("HAS_CREDIT"),
-                        resultSet.getLong("SAVING_DEPOSITS"),
-                        resultSet.getLong("DEBIT_DEPOSITS"),
-                        resultSet.getLong("DEBIT_WITHDRAWALS")
-                ),
+                (rs, rowNum) -> {
+                    ProductTypeMetrics debit = new ProductTypeMetrics(
+                            rs.getLong("DEBIT_COUNT"),
+                            rs.getBigDecimal("DEBIT_DEPOSITS"),
+                            rs.getBigDecimal("DEBIT_WITHDRAWALS")
+                    );
+
+                    ProductTypeMetrics credit = new ProductTypeMetrics(
+                            rs.getLong("CREDIT_COUNT"),
+                            rs.getBigDecimal("CREDIT_DEPOSITS"),
+                            rs.getBigDecimal("CREDIT_WITHDRAWALS")
+                    );
+
+                    ProductTypeMetrics invest = new ProductTypeMetrics(
+                            rs.getLong("INVEST_COUNT"),
+                            rs.getBigDecimal("INVEST_DEPOSITS"),
+                            rs.getBigDecimal("INVEST_WITHDRAWALS")
+                    );
+
+                    ProductTypeMetrics saving = new ProductTypeMetrics(
+                            rs.getLong("SAVING_COUNT"),
+                            rs.getBigDecimal("SAVING_DEPOSITS"),
+                            rs.getBigDecimal("SAVING_WITHDRAWALS")
+                    );
+
+                    Map<ProductType, ProductTypeMetrics> metrics = Map.of(
+                            ProductType.DEBIT, debit,
+                            ProductType.CREDIT, credit,
+                            ProductType.INVEST, invest,
+                            ProductType.SAVING, saving
+                    );
+
+                    return new CustomerMetrics(
+                            debit.transactionCount() > 0,
+                            invest.transactionCount() > 0,
+                            credit.transactionCount() > 0,
+                            saving.depositSum().longValue(),
+                            debit.depositSum().longValue(),
+                            debit.withdrawSum().longValue(),
+                            metrics
+                    );
+                },
                 userId
         );
 
         return results.stream()
                 .findFirst()
-                .orElse(CustomerMetrics.empty());
+                .orElseGet(CustomerMetrics::empty);
+    }
+
+    public void clearCache() {
+        customerMetricsCache.invalidateAll();
     }
 }

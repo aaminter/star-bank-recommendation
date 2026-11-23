@@ -1,3 +1,4 @@
+
 package com.aaminter.starbankrecommendation.service;
 
 import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
@@ -35,17 +36,22 @@ class DynamicRuleServiceTest {
 
     @Test
     void createRule_ShouldSaveAndReturnDtoWithGeneratedId() {
-
         UUID productId = UUID.randomUUID();
+
         List<RuleQueryDto> queries = List.of(
                 new RuleQueryDto("USER_OF", List.of("CREDIT"), true),
-                new RuleQueryDto("TRANSACTION_SUM_COMPARE", List.of("DEBIT", "DEPOSIT", ">", "100000"), false)
+                new RuleQueryDto(
+                        "TRANSACTION_SUM_COMPARE",
+                        List.of("DEBIT", "DEPOSIT", ">", "100000"),
+                        false
+                )
         );
+
         DynamicRuleDto inputDto = new DynamicRuleDto(
                 null,
-                "Простой кредит",
+                "РџСЂРѕСЃС‚РѕР№ РєСЂРµРґРёС‚",
                 productId,
-                "Текст рекомендации",
+                "РўРµРєСЃС‚ СЂРµРєРѕРјРµРЅРґР°С†РёРё",
                 queries
         );
 
@@ -57,41 +63,84 @@ class DynamicRuleServiceTest {
 
         DynamicRuleDto result = ruleService.createRule(inputDto);
 
-
         assertNotNull(result);
         assertEquals(1L, result.id());
-        assertEquals("Простой кредит", result.productName());
+        assertEquals("РџСЂРѕСЃС‚РѕР№ РєСЂРµРґРёС‚", result.productName());
         assertEquals(productId, result.productId());
-        assertEquals("Текст рекомендации", result.productText());
+        assertEquals("РўРµРєСЃС‚ СЂРµРєРѕРјРµРЅРґР°С†РёРё", result.productText());
         assertEquals(2, result.rule().size());
+
         verify(repository, times(1)).save(any(DynamicRule.class));
     }
 
     @Test
     void getAllRules_ShouldReturnMappedListOfDtos() {
         UUID productId = UUID.randomUUID();
-        String jsonRule = "[{\"query\":\"USER_OF\",\"arguments\":[\"DEBIT\"],\"negate\":false}]";
-        DynamicRule entity = new DynamicRule(productId, "Дебетовая карта", "Текст", jsonRule);
+
+        String jsonRule =
+                "[{\"query\":\"USER_OF\",\"arguments\":[\"DEBIT\"],\"negate\":false}]";
+
+        DynamicRule entity = new DynamicRule(
+                productId,
+                "Р”РµР±РµС‚РѕРІР°СЏ РєР°СЂС‚Р°",
+                "РўРµРєСЃС‚",
+                jsonRule
+        );
         entity.setId(10L);
 
         when(repository.findAll()).thenReturn(List.of(entity));
 
+        List<DynamicRuleDto> rules = ruleService.getAllRules();
+
+        assertEquals(1, rules.size());
+
+        DynamicRuleDto dto = rules.get(0);
+
+        assertEquals(10L, dto.id());
+        assertEquals("Р”РµР±РµС‚РѕРІР°СЏ РєР°СЂС‚Р°", dto.productName());
+        assertEquals(1, dto.rule().size());
+        assertEquals("USER_OF", dto.rule().get(0).query());
+        assertFalse(dto.rule().get(0).negate());
+
+        verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    void getAllRules_ShouldSkipInvalidJsonAndReturnValidRules() {
+        UUID validProductId = UUID.randomUUID();
+
+        DynamicRule invalidRule = new DynamicRule(
+                UUID.randomUUID(),
+                "Invalid rule",
+                "Invalid rule text",
+                "not-valid-json"
+        );
+        invalidRule.setId(20L);
+
+        DynamicRule validRule = new DynamicRule(
+                validProductId,
+                "Valid rule",
+                "Valid rule text",
+                "[{\"query\":\"USER_OF\",\"arguments\":[\"DEBIT\"],\"negate\":false}]"
+        );
+        validRule.setId(21L);
+
+        when(repository.findAll()).thenReturn(List.of(invalidRule, validRule));
 
         List<DynamicRuleDto> rules = ruleService.getAllRules();
 
         assertEquals(1, rules.size());
-        DynamicRuleDto dto = rules.get(0);
-        assertEquals(10L, dto.id());
-        assertEquals("Дебетовая карта", dto.productName());
-        assertEquals(1, dto.rule().size());
-        assertEquals("USER_OF", dto.rule().get(0).query());
-        assertFalse(dto.rule().get(0).negate());
+        assertEquals(21L, rules.get(0).id());
+        assertEquals("Valid rule", rules.get(0).productName());
+        assertEquals("USER_OF", rules.get(0).rule().get(0).query());
+
         verify(repository, times(1)).findAll();
     }
 
     @Test
     void deleteRule_ShouldCallRepositoryDeleteById() {
         Long ruleId = 5L;
+
         when(repository.existsById(ruleId)).thenReturn(true);
 
         ruleService.deleteRule(ruleId);
@@ -103,10 +152,14 @@ class DynamicRuleServiceTest {
     @Test
     void deleteRule_WhenNotFound_ShouldThrowException() {
         Long ruleId = 999L;
+
         when(repository.existsById(ruleId)).thenReturn(false);
 
-        assertThrows(jakarta.persistence.EntityNotFoundException.class, () -> ruleService.deleteRule(ruleId));
+        assertThrows(
+                jakarta.persistence.EntityNotFoundException.class,
+                () -> ruleService.deleteRule(ruleId)
+        );
+
         verify(repository, never()).deleteById(any());
     }
-
 }

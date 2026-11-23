@@ -1,8 +1,10 @@
+
 package com.aaminter.starbankrecommendation.controller;
 
 import com.aaminter.starbankrecommendation.dto.DynamicRuleDto;
 import com.aaminter.starbankrecommendation.dto.RuleQueryDto;
 import com.aaminter.starbankrecommendation.service.DynamicRuleService;
+import com.aaminter.starbankrecommendation.service.RuleStatsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -12,13 +14,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DynamicRuleController.class)
 class DynamicRuleControllerTest {
@@ -31,6 +36,9 @@ class DynamicRuleControllerTest {
 
     @MockitoBean
     private DynamicRuleService ruleService;
+
+    @MockitoBean
+    private RuleStatsService ruleStatsService;
 
     @Test
     void createRule_ShouldReturn200AndCreatedRule() throws Exception {
@@ -69,10 +77,24 @@ class DynamicRuleControllerTest {
     }
 
     @Test
-    void deleteRule_ShouldReturn204NoContent() throws Exception {
-        doNothing().when(ruleService).deleteRule(1L);
-
+    void deleteRule_ShouldReturn204() throws Exception {
         mockMvc.perform(delete("/rule/{id}", 1L))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getRuleStats_ShouldReturn200AndStatsArray() throws Exception {
+        when(ruleStatsService.getAllStats()).thenReturn(List.of(
+                Map.of("rule_id", "1", "count", "5"),
+                Map.of("rule_id", "2", "count", "0")
+        ));
+
+        mockMvc.perform(get("/rule/stats"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stats").isArray())
+                .andExpect(jsonPath("$.stats[0].rule_id").value("1"))
+                .andExpect(jsonPath("$.stats[0].count").value("5"))
+                .andExpect(jsonPath("$.stats[1].rule_id").value("2"))
+                .andExpect(jsonPath("$.stats[1].count").value("0"));
     }
 }

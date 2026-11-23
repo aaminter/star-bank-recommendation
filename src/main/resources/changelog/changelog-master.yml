@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: changelog/db.changelog.sql
+  - include:
+      file: changelog/db.changelog-stats.sql

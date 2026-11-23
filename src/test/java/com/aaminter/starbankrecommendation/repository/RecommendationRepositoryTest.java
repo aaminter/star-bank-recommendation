@@ -1,11 +1,13 @@
 package com.aaminter.starbankrecommendation.repository;
 
 import com.aaminter.starbankrecommendation.model.CustomerMetrics;
+import com.aaminter.starbankrecommendation.model.ProductType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,14 +24,19 @@ class RecommendationRepositoryTest {
     private UUID investProductId;
     private UUID creditProductId;
 
+    private static final UUID USER_ID = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
-        String databaseName = "recommendation_test_"
-                + UUID.randomUUID().toString().replace("-", "");
+        DriverManagerDataSource dataSource =
+                new DriverManagerDataSource();
 
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1");
+        dataSource.setUrl(
+                "jdbc:h2:mem:recommendation_test_"
+                        + UUID.randomUUID().toString().replace("-", "")
+                        + ";DB_CLOSE_DELAY=-1"
+        );
         dataSource.setUsername("sa");
         dataSource.setPassword("");
 
@@ -38,18 +45,18 @@ class RecommendationRepositoryTest {
         jdbcTemplate.execute("""
                 CREATE TABLE PRODUCTS (
                     ID UUID PRIMARY KEY,
-                    TYPE VARCHAR(255) NOT NULL,
-                    NAME VARCHAR(255) NOT NULL
+                    TYPE VARCHAR(50),
+                    NAME VARCHAR(100)
                 )
                 """);
 
         jdbcTemplate.execute("""
                 CREATE TABLE TRANSACTIONS (
                     ID UUID PRIMARY KEY,
-                    PRODUCT_ID UUID NOT NULL,
-                    USER_ID UUID NOT NULL,
-                    TYPE VARCHAR(255) NOT NULL,
-                    AMOUNT INTEGER NOT NULL
+                    PRODUCT_ID UUID,
+                    USER_ID UUID,
+                    TYPE VARCHAR(50),
+                    AMOUNT DECIMAL(19, 2)
                 )
                 """);
 
@@ -63,45 +70,59 @@ class RecommendationRepositoryTest {
 
     @Test
     void shouldCalculateMetricsByUserAndProductType() {
-        UUID userId = UUID.randomUUID();
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 100_000);
+        insertTransaction(debitProductId, USER_ID, "WITHDRAW", 40_000);
+        insertTransaction(savingProductId, USER_ID, "DEPOSIT", 1_200);
+        insertTransaction(investProductId, USER_ID, "WITHDRAW", 5_000);
 
-        insertTransaction(debitProductId, userId, "DEPOSIT", 100_000);
-        insertTransaction(debitProductId, userId, "WITHDRAW", 40_000);
-        insertTransaction(savingProductId, userId, "DEPOSIT", 1_200);
-        insertTransaction(investProductId, userId, "WITHDRAW", 5_000);
-
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
+        CustomerMetrics metrics = repository.getCustomerMetrics(USER_ID);
 
         assertTrue(metrics.hasDebit());
         assertTrue(metrics.hasInvest());
         assertFalse(metrics.hasCredit());
+
         assertEquals(1_200, metrics.savingDeposits());
         assertEquals(100_000, metrics.debitDeposits());
         assertEquals(40_000, metrics.debitWithdrawals());
+
+        assertEquals(
+                new BigDecimal("100000.00"),
+                metrics.forProduct(ProductType.DEBIT).depositSum()
+        );
+        assertEquals(
+                new BigDecimal("40000.00"),
+                metrics.forProduct(ProductType.DEBIT).withdrawSum()
+        );
+        assertEquals(
+                new BigDecimal("5000.00"),
+                metrics.forProduct(ProductType.INVEST).withdrawSum()
+        );
     }
 
     @Test
     void shouldReturnZeroMetricsWhenUserHasNoTransactions() {
-        UUID userIdWithoutTransactions = UUID.randomUUID();
-
         CustomerMetrics metrics =
-                repository.getCustomerMetrics(userIdWithoutTransactions);
+                repository.getCustomerMetrics(UUID.randomUUID());
 
         assertFalse(metrics.hasDebit());
         assertFalse(metrics.hasInvest());
         assertFalse(metrics.hasCredit());
+
         assertEquals(0, metrics.savingDeposits());
         assertEquals(0, metrics.debitDeposits());
         assertEquals(0, metrics.debitWithdrawals());
+
+        assertEquals(
+                BigDecimal.ZERO,
+                metrics.forProduct(ProductType.DEBIT).depositSum()
+        );
     }
 
     @Test
     void shouldDetectCreditProductWhenTransactionExists() {
-        UUID userId = UUID.randomUUID();
+        insertTransaction(creditProductId, USER_ID, "WITHDRAW", 100);
 
-        insertTransaction(creditProductId, userId, "WITHDRAW", 100);
-
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
+        CustomerMetrics metrics = repository.getCustomerMetrics(USER_ID);
 
         assertTrue(metrics.hasCredit());
         assertFalse(metrics.hasDebit());
@@ -109,35 +130,99 @@ class RecommendationRepositoryTest {
 
     @Test
     void shouldSeparateDepositsAndWithdrawalsByProductType() {
-        UUID userId = UUID.randomUUID();
+        insertTransaction(savingProductId, USER_ID, "DEPOSIT", 1_200);
+        insertTransaction(savingProductId, USER_ID, "WITHDRAW", 900);
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 300);
+        insertTransaction(debitProductId, USER_ID, "WITHDRAW", 100);
 
-        insertTransaction(savingProductId, userId, "DEPOSIT", 1_200);
-        insertTransaction(savingProductId, userId, "WITHDRAW", 900);
-        insertTransaction(debitProductId, userId, "DEPOSIT", 300);
-        insertTransaction(debitProductId, userId, "WITHDRAW", 100);
+        CustomerMetrics metrics = repository.getCustomerMetrics(USER_ID);
 
-        CustomerMetrics metrics = repository.getCustomerMetrics(userId);
-
-        assertEquals(1_200, metrics.savingDeposits());
-        assertEquals(300, metrics.debitDeposits());
-        assertEquals(100, metrics.debitWithdrawals());
+        assertEquals(
+                new BigDecimal("1200.00"),
+                metrics.forProduct(ProductType.SAVING).depositSum()
+        );
+        assertEquals(
+                new BigDecimal("900.00"),
+                metrics.forProduct(ProductType.SAVING).withdrawSum()
+        );
+        assertEquals(
+                new BigDecimal("300.00"),
+                metrics.forProduct(ProductType.DEBIT).depositSum()
+        );
+        assertEquals(
+                new BigDecimal("100.00"),
+                metrics.forProduct(ProductType.DEBIT).withdrawSum()
+        );
     }
 
     @Test
     void shouldIgnoreTransactionsOfOtherUsers() {
-        UUID requestedUserId = UUID.randomUUID();
         UUID anotherUserId = UUID.randomUUID();
 
-        insertTransaction(debitProductId, requestedUserId, "DEPOSIT", 1_000);
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 1_000);
         insertTransaction(debitProductId, anotherUserId, "DEPOSIT", 100_000);
         insertTransaction(debitProductId, anotherUserId, "WITHDRAW", 50_000);
 
-        CustomerMetrics metrics =
-                repository.getCustomerMetrics(requestedUserId);
+        CustomerMetrics metrics = repository.getCustomerMetrics(USER_ID);
 
         assertTrue(metrics.hasDebit());
         assertEquals(1_000, metrics.debitDeposits());
         assertEquals(0, metrics.debitWithdrawals());
+    }
+
+    @Test
+    void shouldReuseCachedMetricsForSameUser() {
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 10_000);
+
+        CustomerMetrics first = repository.getCustomerMetrics(USER_ID);
+
+        assertEquals(
+                new BigDecimal("10000.00"),
+                first.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 5_000);
+
+        CustomerMetrics cached = repository.getCustomerMetrics(USER_ID);
+
+        assertEquals(
+                new BigDecimal("10000.00"),
+                cached.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        repository.clearCache();
+
+        CustomerMetrics refreshed = repository.getCustomerMetrics(USER_ID);
+
+        assertEquals(
+                new BigDecimal("15000.00"),
+                refreshed.forProduct(ProductType.DEBIT).depositSum()
+        );
+    }
+
+    @Test
+    void shouldKeepSeparateCacheEntriesForDifferentUsers() {
+        UUID firstUser = UUID.randomUUID();
+        UUID secondUser = UUID.randomUUID();
+
+        insertTransaction(debitProductId, firstUser, "DEPOSIT", 1_000);
+        insertTransaction(debitProductId, secondUser, "DEPOSIT", 9_000);
+
+        CustomerMetrics firstMetrics =
+                repository.getCustomerMetrics(firstUser);
+
+        CustomerMetrics secondMetrics =
+                repository.getCustomerMetrics(secondUser);
+
+        assertEquals(
+                new BigDecimal("1000.00"),
+                firstMetrics.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        assertEquals(
+                new BigDecimal("9000.00"),
+                secondMetrics.forProduct(ProductType.DEBIT).depositSum()
+        );
     }
 
     private UUID insertProduct(String type, String name) {
@@ -161,7 +246,8 @@ class RecommendationRepositoryTest {
     ) {
         jdbcTemplate.update(
                 """
-                INSERT INTO TRANSACTIONS (ID, PRODUCT_ID, USER_ID, TYPE, AMOUNT)
+                INSERT INTO TRANSACTIONS
+                (ID, PRODUCT_ID, USER_ID, TYPE, AMOUNT)
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 UUID.randomUUID(),
