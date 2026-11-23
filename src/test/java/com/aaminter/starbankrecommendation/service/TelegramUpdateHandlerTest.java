@@ -151,7 +151,9 @@ class TelegramUpdateHandlerTest {
         when(update.message()).thenReturn(message);
         when(message.chat()).thenReturn(chat);
         when(chat.id()).thenReturn(555L);
-        when(chat.type()).thenReturn(chatType);
+        when(chat.type()).thenReturn(
+                "private".equals(chatType) ? Chat.Type.Private : Chat.Type.group
+        );
         when(message.from()).thenReturn(sender);
         when(sender.id()).thenReturn(senderId);
         when(message.text()).thenReturn(text);
