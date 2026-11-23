@@ -8,6 +8,9 @@ import java.util.UUID;
 /**
  * API response containing the requested user's ID and their recommendations.
  */
+/**
+ * API response containing the requested user's ID and their recommendations.
+ */
 public record RecommendationResponse(
         @JsonProperty("user_id")
         UUID userId,
