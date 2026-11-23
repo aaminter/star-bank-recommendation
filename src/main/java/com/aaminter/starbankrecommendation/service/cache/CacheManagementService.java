@@ -12,10 +12,18 @@ public class CacheManagementService {
 
     private final List<CacheClearable> cacheOwners;
 
+    /**
+     * Creates the service with all cache-owning components registered by Spring.
+     *
+     * @param cacheOwners components whose caches can be invalidated
+     */
     public CacheManagementService(List<CacheClearable> cacheOwners) {
         this.cacheOwners = List.copyOf(cacheOwners);
     }
 
+    /**
+     * Invokes cache invalidation on every registered cache owner.
+     */
     public void clearAllCaches() {
         cacheOwners.forEach(CacheClearable::clearCache);
     }
