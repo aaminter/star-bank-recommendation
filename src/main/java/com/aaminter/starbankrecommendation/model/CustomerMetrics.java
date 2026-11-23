@@ -26,6 +26,16 @@ public record CustomerMetrics(
     }
 
     // Совместимость с существующими фиксированными правилами и тестами.
+    /**
+     * Creates metrics without per-product aggregates for compatibility with fixed rules.
+     *
+     * @param hasDebit whether the customer has a debit product
+     * @param hasInvest whether the customer has an investment product
+     * @param hasCredit whether the customer has a credit product
+     * @param savingDeposits total savings deposits
+     * @param debitDeposits total debit deposits
+     * @param debitWithdrawals total debit withdrawals
+     */
     public CustomerMetrics(
             boolean hasDebit,
             boolean hasInvest,
