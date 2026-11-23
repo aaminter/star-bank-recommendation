@@ -15,6 +15,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Combines static and database-driven rules to produce customer recommendations.
+ *
+ * <p>Customer metrics are loaded once and reused for both rule types.
+ * Statistics are incremented for each matching dynamic rule, but not for
+ * static rule sets.</p>
+ */
 @Service
 public class RecommendationService {
 
@@ -27,6 +34,15 @@ public class RecommendationService {
     private final DynamicRuleEngine dynamicRuleEngine;
     private final RuleStatsService ruleStatsService;
 
+    /**
+     * Creates the service with the metrics repository and rule evaluators.
+     *
+     * @param repository repository providing aggregated customer metrics
+     * @param ruleSets registered static recommendation rule sets
+     * @param dynamicRuleService service providing persisted dynamic rules
+     * @param dynamicRuleEngine engine evaluating dynamic rule conditions
+     * @param ruleStatsService service recording dynamic rule matches
+     */
     public RecommendationService(
             RecommendationRepository repository,
             List<RecommendationRuleSet> ruleSets,
@@ -41,6 +57,17 @@ public class RecommendationService {
         this.ruleStatsService = ruleStatsService;
     }
 
+    /**
+     * Evaluates all static and valid dynamic rules for the specified customer.
+     *
+     * <p>Each matching dynamic rule contributes one recommendation and has its
+     * execution counter incremented once. Dynamic rules that fail evaluation
+     * because of invalid arguments or unsupported conditions are logged and
+     * skipped; evaluation continues with the remaining rules.</p>
+     *
+     * @param userId UUID of the customer whose metrics are evaluated
+     * @return response containing the customer UUID and matching recommendations
+     */
     public RecommendationResponse getRecommendations(UUID userId) {
         CustomerMetrics metrics = repository.getCustomerMetrics(userId);
 
