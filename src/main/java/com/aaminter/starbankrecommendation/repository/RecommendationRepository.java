@@ -15,6 +15,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Loads aggregated customer transaction metrics from the source database.
+ *
+ * <p>Results are cached by customer UUID in a local Caffeine cache with a
+ * maximum of 10,000 entries and a 10-minute expire-after-write policy.
+ * The cache can be invalidated through {@link #clearCache()}.</p>
+ */
 @Repository
 public class RecommendationRepository implements CacheClearable {
 
@@ -74,10 +81,25 @@ public class RecommendationRepository implements CacheClearable {
                     .expireAfterWrite(Duration.ofMinutes(10))
                     .build();
 
+    /**
+     * Creates the repository using the JDBC template for source database queries.
+     *
+     * @param jdbcTemplate JDBC access to the source customer database
+     */
     public RecommendationRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Returns aggregated metrics for a customer, using the local cache when possible.
+     *
+     * <p>A cache miss triggers one aggregate query for transaction counts,
+     * deposit totals and withdrawal totals across the customer's product types.</p>
+     *
+     * @param userId UUID of the customer
+     * @return aggregated metrics, or empty metrics when the query returns no row
+     * @throws NullPointerException if {@code userId} is null
+     */
     public CustomerMetrics getCustomerMetrics(UUID userId) {
         Objects.requireNonNull(userId, "userId must not be null");
 
@@ -140,6 +162,11 @@ public class RecommendationRepository implements CacheClearable {
                 .orElseGet(CustomerMetrics::empty);
     }
 
+    /**
+     * Invalidates all cached customer metrics.
+     *
+     * <p>The next lookup for a customer reloads metrics from the source database.</p>
+     */
     @Override
     public void clearCache() {
         customerMetricsCache.invalidateAll();
