@@ -13,17 +13,35 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Evaluates dynamic rule conditions against aggregated customer metrics.
+ *
+ * <p>All conditions in a rule must match (AND semantics). The {@code negate}
+ * flag is applied to each condition individually before the combined result
+ * is determined.</p>
+ */
 @Service
 public class DynamicRuleEngine {
 
     private final RecommendationRepository repository;
 
+    /**
+     * Creates the engine with the repository used to load customer metrics.
+     *
+     * @param repository repository providing aggregated customer metrics
+     */
     public DynamicRuleEngine(RecommendationRepository repository) {
         this.repository = repository;
     }
 
     /**
-     * Проверяет динамическое правило для пользователя.
+     * Loads metrics for a customer and evaluates the supplied conditions.
+     *
+     * @param userId UUID of the customer whose metrics are evaluated
+     * @param conditions conditions that form the dynamic rule
+     * @return {@code true} only when the non-empty condition list matches
+     * @throws NullPointerException if {@code userId} or {@code conditions} is null
+     * @throws IllegalArgumentException if a condition type or argument is unsupported
      */
     public boolean matches(
             UUID userId,
@@ -38,7 +56,17 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Проверяет все условия правила по принципу AND.
+     * Evaluates conditions against already loaded customer metrics.
+     *
+     * <p>Conditions are combined using AND. An individual condition is
+     * inverted when its {@code negate} flag is true. An empty condition list
+     * does not match.</p>
+     *
+     * @param metrics aggregated metrics used for evaluation
+     * @param conditions conditions that form the dynamic rule
+     * @return {@code true} if every condition matches after its optional negation
+     * @throws NullPointerException if metrics, conditions, or a condition is null
+     * @throws IllegalArgumentException if a query type, argument, or comparison operator is unsupported
      */
     public boolean matches(
             CustomerMetrics metrics,
