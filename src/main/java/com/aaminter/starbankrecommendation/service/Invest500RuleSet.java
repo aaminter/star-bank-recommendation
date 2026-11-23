@@ -6,6 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Applies the static rule for the Invest 500 recommendation.
+ *
+ * <p>The recommendation is offered to customers who have a debit product,
+ * do not have an investment product, and have saving deposits greater than
+ * 1,000.</p>
+ */
 @Component
 public class Invest500RuleSet implements RecommendationRuleSet {
 
@@ -18,6 +25,12 @@ public class Invest500RuleSet implements RecommendationRuleSet {
             Откройте свой путь к успеху с индивидуальным инвестиционным счетом (ИИС) от нашего банка! Воспользуйтесь налоговыми льготами и начните инвестировать с умом. Пополните счет до конца года и получите выгоду в виде вычета на взнос в следующем налоговом периоде. Не упустите возможность разнообразить свой портфель, снизить риски и следить за актуальными рыночными тенденциями. Откройте ИИС сегодня и станьте ближе к финансовой независимости!
             """;
 
+    /**
+     * Checks whether the customer meets the Invest 500 eligibility conditions.
+     *
+     * @param metrics aggregated metrics of the customer
+     * @return the Invest 500 recommendation when all conditions match; otherwise empty
+     */
     @Override
     public Optional<RecommendationDto> check(CustomerMetrics metrics) {
         boolean matches =
