@@ -17,14 +17,10 @@ class ManagementInfoControllerTest {
         ManagementInfoController controller =
                 new ManagementInfoController(buildProperties);
 
-        assertEquals(
-                "star-bank-recommendation",
-                controller.getInfo().get("name")
-        );
-        assertEquals(
-                "0.0.1-SNAPSHOT",
-                controller.getInfo().get("version")
-        );
+        var info = controller.getInfo();
+
+        assertEquals("star-bank-recommendation", info.get("name"));
+        assertEquals("0.0.1-SNAPSHOT", info.get("version"));
         verify(buildProperties).getArtifact();
         verify(buildProperties).getVersion();
     }
