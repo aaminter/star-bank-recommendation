@@ -9,6 +9,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+import com.github.benmanes.caffeine.cache.Ticker;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -223,6 +227,51 @@ class RecommendationRepositoryTest {
                 new BigDecimal("9000.00"),
                 secondMetrics.forProduct(ProductType.DEBIT).depositSum()
         );
+    }
+
+
+    @Test
+    void shouldReloadMetricsAfterCacheEntryExpires() {
+        FakeTicker ticker = new FakeTicker();
+        repository = new RecommendationRepository(jdbcTemplate, ticker);
+
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 10_000);
+
+        CustomerMetrics initial = repository.getCustomerMetrics(USER_ID);
+        assertEquals(
+                new BigDecimal("10000.00"),
+                initial.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        insertTransaction(debitProductId, USER_ID, "DEPOSIT", 5_000);
+
+        CustomerMetrics cached = repository.getCustomerMetrics(USER_ID);
+        assertEquals(
+                new BigDecimal("10000.00"),
+                cached.forProduct(ProductType.DEBIT).depositSum()
+        );
+
+        ticker.advance(Duration.ofMinutes(11));
+
+        CustomerMetrics refreshed = repository.getCustomerMetrics(USER_ID);
+        assertEquals(
+                new BigDecimal("15000.00"),
+                refreshed.forProduct(ProductType.DEBIT).depositSum()
+        );
+    }
+
+    private static final class FakeTicker implements Ticker {
+
+        private final AtomicLong nanos = new AtomicLong();
+
+        @Override
+        public long read() {
+            return nanos.get();
+        }
+
+        void advance(Duration duration) {
+            nanos.addAndGet(duration.toNanos());
+        }
     }
 
     private UUID insertProduct(String type, String name) {
