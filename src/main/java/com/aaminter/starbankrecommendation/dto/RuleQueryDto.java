@@ -7,6 +7,9 @@ import java.util.List;
 /**
  * One condition in a dynamic rule, including its query arguments and negation flag.
  */
+/**
+ * One condition in a dynamic rule, including its query arguments and negation flag.
+ */
 public record RuleQueryDto(
         @NotBlank(message = "Поле query не может быть пустым")
         String query,
