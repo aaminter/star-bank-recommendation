@@ -40,6 +40,6 @@ This is a first-version decision, not a claim that arbitrary nested boolean expr
 - A future schema extension may be required if business rules need more complex logic.
 
 ### Follow-up
-- [ ] Add examples to the API contract.
+- [x] Add examples and condition-composition semantics to the OpenAPI contract.
 - [x] Test empty condition lists, one condition, multiple conditions, negate true/false, and mixed results.
 - [x] Decide explicitly that an empty list is invalid and does not match.
