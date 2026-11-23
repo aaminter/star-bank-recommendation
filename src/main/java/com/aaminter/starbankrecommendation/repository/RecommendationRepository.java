@@ -8,6 +8,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Ticker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -84,6 +85,7 @@ public class RecommendationRepository implements CacheClearable {
      *
      * @param jdbcTemplate JDBC access to the source customer database
      */
+    @Autowired
     @Autowired
     public RecommendationRepository(JdbcTemplate jdbcTemplate) {
         this(jdbcTemplate, Ticker.systemTicker());
