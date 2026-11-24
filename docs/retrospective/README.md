@@ -1,14 +1,14 @@
-# Team Retrospectives
+# Ретроспективы команды
 
-Add one dated file per retrospective, for example `2026-11-14.md`.
+Для каждой ретроспективы создавайте отдельный файл с датой в названии, например `2026-11-14.md`.
 
-Use evidence from Issues, Pull Requests, review discussions, and test runs.
+Используйте фактические данные из Issues, Pull Requests, обсуждений проверки кода и запусков тестов.
 
-Suggested structure:
-1. Planned versus completed work.
-2. What helped delivery.
-3. What slowed delivery and why.
-4. Decisions that should be revisited.
-5. Up to five concrete improvement actions, each with an owner and verification method.
+Рекомендуемая структура:
+1. Запланированная и фактически выполненная работа.
+2. Что помогало завершать задачи.
+3. Что замедляло работу и почему.
+4. Решения, которые следует пересмотреть.
+5. Не более пяти конкретных действий по улучшению, для каждого укажите ответственного и способ проверки результата.
 
-Keep the discussion blameless and focused on process and observable facts.
+Обсуждайте процесс без поиска виноватых и опирайтесь на наблюдаемые факты.
