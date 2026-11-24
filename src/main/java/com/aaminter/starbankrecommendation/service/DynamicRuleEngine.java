@@ -99,7 +99,13 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Выбирает обработчик по типу запроса.
+     * Selects the evaluator associated with the condition's query type.
+     *
+     * @param metrics customer metrics used by the selected evaluator
+     * @param condition condition containing the query type and arguments
+     * @return result produced by the matching query evaluator
+     * @throws NullPointerException if {@code condition} is null
+     * @throws IllegalArgumentException if the query type is unsupported
      */
     private boolean evaluateCondition(
             CustomerMetrics metrics,
@@ -130,8 +136,12 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Проверяет наличие хотя бы одной транзакции
-     * по продукту указанного типа.
+     * Checks whether the customer has at least one transaction for a product type.
+     *
+     * @param metrics aggregated customer metrics
+     * @param condition condition whose first argument is a product type
+     * @return {@code true} when the customer has at least one transaction of that type
+     * @throws IllegalArgumentException if the condition has an invalid argument count or product type
      */
     private boolean evaluateUserOf(
             CustomerMetrics metrics,
@@ -147,8 +157,12 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Проверяет наличие минимум пяти транзакций
-     * по продукту указанного типа.
+     * Checks whether the customer has at least five transactions for a product type.
+     *
+     * @param metrics aggregated customer metrics
+     * @param condition condition whose first argument is a product type
+     * @return {@code true} when the transaction count is at least five
+     * @throws IllegalArgumentException if the condition has an invalid argument count or product type
      */
     private boolean evaluateActiveUserOf(
             CustomerMetrics metrics,
@@ -164,14 +178,15 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Сравнивает сумму пополнений или трат
-     * с заданной константой.
+     * Compares a product's deposit or withdrawal sum with a numeric threshold.
      *
-     * arguments:
-     * 0 - product type
-     * 1 - transaction type
-     * 2 - comparison operator
-     * 3 - non-negative integer
+     * <p>Arguments are the product type, transaction type, comparison operator,
+     * and a non-negative integer threshold, in that order.</p>
+     *
+     * @param metrics aggregated customer metrics
+     * @param condition condition containing the four comparison arguments
+     * @return result of the requested comparison
+     * @throws IllegalArgumentException if an argument, type, threshold, or operator is invalid
      */
     private boolean evaluateTransactionSumCompare(
             CustomerMetrics metrics,
@@ -205,12 +220,12 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Сравнивает общую сумму пополнений
-     * с общей суммой трат по продукту.
+     * Compares the total deposits with the total withdrawals for a product type.
      *
-     * arguments:
-     * 0 - product type
-     * 1 - comparison operator
+     * @param metrics aggregated customer metrics
+     * @param condition condition containing the product type and comparison operator
+     * @return result of comparing the deposit and withdrawal totals
+     * @throws IllegalArgumentException if the argument count, product type, or operator is invalid
      */
     private boolean evaluateDepositWithdrawCompare(
             CustomerMetrics metrics,
@@ -234,7 +249,13 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Выполняет сравнение BigDecimal без потери точности.
+     * Compares two decimal values without converting them to a less precise numeric type.
+     *
+     * @param left first value
+     * @param operator supported comparison operator
+     * @param right second value
+     * @return result of applying the operator to the two values
+     * @throws IllegalArgumentException if the operator is null or unsupported
      */
     private boolean compare(
             BigDecimal left,
@@ -262,6 +283,13 @@ public class DynamicRuleEngine {
         };
     }
 
+    /**
+     * Converts a condition argument to a supported product type.
+     *
+     * @param value product type name
+     * @return parsed product type
+     * @throws IllegalArgumentException if the value is null or is not a supported product type
+     */
     private ProductType parseProductType(String value) {
         try {
             return ProductType.valueOf(value);
@@ -273,6 +301,13 @@ public class DynamicRuleEngine {
         }
     }
 
+    /**
+     * Converts a condition argument to a supported transaction type.
+     *
+     * @param value transaction type name
+     * @return parsed transaction type
+     * @throws IllegalArgumentException if the value is null or is not a supported transaction type
+     */
     private TransactionType parseTransactionType(String value) {
         try {
             return TransactionType.valueOf(value);
@@ -285,8 +320,11 @@ public class DynamicRuleEngine {
     }
 
     /**
-     * Константа должна быть неотрицательным целым числом
-     * в диапазоне Integer.
+     * Parses a non-negative integer threshold within the {@link Integer} range.
+     *
+     * @param value threshold supplied as a condition argument
+     * @return parsed threshold
+     * @throws IllegalArgumentException if the value is not a non-negative integer or exceeds the integer range
      */
     private int parseThreshold(String value) {
         if (value == null || !value.matches("\\d+")) {
@@ -305,6 +343,13 @@ public class DynamicRuleEngine {
         }
     }
 
+    /**
+     * Ensures that a condition contains exactly the number of arguments required by its query.
+     *
+     * @param condition condition being validated
+     * @param expectedCount required number of arguments
+     * @throws IllegalArgumentException if the actual argument count differs from the expected count
+     */
     private void validateArguments(
             DynamicRuleCondition condition,
             int expectedCount
