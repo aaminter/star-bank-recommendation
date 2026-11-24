@@ -2,9 +2,9 @@
 
 ## Обзор
 
-Приложение построено как Spring Boot backend. REST-контроллеры и Telegram-обработчик используют общий сервис рекомендаций. Сервис загружает метрики клиента из read-only H2 через JdbcTemplate, проверяет фиксированные наборы правил и динамические правила из PostgreSQL. При совпадении динамического правила увеличивается его счётчик.
+Приложение построено как backend на Spring Boot. REST-контроллеры и обработчик Telegram используют общий сервис рекомендаций. Сервис загружает метрики клиента из базы H2, доступной только для чтения, через JdbcTemplate, проверяет фиксированные наборы правил и динамические правила из PostgreSQL. При совпадении динамического правила увеличивается его счётчик срабатываний.
 
-## Component Diagram
+## Диаграмма компонентов
 
 ```mermaid
 flowchart LR
@@ -12,34 +12,34 @@ flowchart LR
     Manager[Менеджер]
     External[Внешняя система]
     TelegramPlatform[Telegram Bot API]
-    H2[(H2 source DB<br/>read-only)]
-    PostgreSQL[(PostgreSQL<br/>rules and stats)]
+    H2[(Исходная БД H2<br/>только чтение)]
+    PostgreSQL[(PostgreSQL<br/>правила и статистика)]
 
-    subgraph App[Spring Boot application]
+    subgraph App[Приложение Spring Boot]
         RC[RecommendationController]
         DC[DynamicRuleController]
         MC[ManagementController]
         IC[ManagementInfoController]
         TH[TelegramUpdateHandler]
         RS[RecommendationService]
-        StaticRules[Static Rule Sets<br/>Invest 500 / Top Saving / Simple Credit]
+        StaticRules[Наборы фиксированных правил<br/>Invest 500 / Top Saving / Simple Credit]
         DRService[DynamicRuleService]
         Engine[DynamicRuleEngine]
         Stats[RuleStatsService]
         Repo[RecommendationRepository]
-        Cache[Caffeine metrics cache]
+        Cache[Кеш метрик Caffeine]
         UserRepo[TelegramUserRepository]
         CacheAdmin[CacheManagementService]
         BuildInfo[BuildProperties]
     end
 
-    User -->|GET recommendations by user ID| RC
-    User -->|/recommend username via bot| TelegramPlatform
-    TelegramPlatform <-->|Updates / SendMessage| TH
-    Manager -->|POST/GET/DELETE rules| DC
-    Manager -->|GET rule stats| DC
-    External -->|POST clear caches| MC
-    External -->|GET application info| IC
+    User -->|GET рекомендации по ID клиента| RC
+    User -->|/recommend username через бота| TelegramPlatform
+    TelegramPlatform <-->|Обновления / SendMessage| TH
+    Manager -->|POST/GET/DELETE правила| DC
+    Manager -->|GET статистика правил| DC
+    External -->|POST очистить кеши| MC
+    External -->|GET информация о приложении| IC
     RC --> RS
     TH --> UserRepo
     TH --> RS
@@ -58,29 +58,29 @@ flowchart LR
     IC --> BuildInfo
 ```
 
-## Activity Diagram: формирование рекомендаций
+## Диаграмма последовательности действий: формирование рекомендаций
 
 ```mermaid
 flowchart TD
-    A([Get recommendations for user ID]) --> B[Load customer metrics]
-    B --> C{Metrics in Caffeine cache?}
-    C -->|Yes| D[Use cached metrics]
-    C -->|No| E[Read aggregates from H2]
-    E --> F[Put metrics into cache]
+    A([Получить рекомендации по ID клиента]) --> B[Загрузить метрики клиента]
+    B --> C{Метрики есть в кеше Caffeine?}
+    C -->|Да| D[Использовать кешированные метрики]
+    C -->|Нет| E[Прочитать агрегаты из H2]
+    E --> F[Поместить метрики в кеш]
     F --> D
-    D --> G[Evaluate all static rule sets]
-    G --> H[Add matching static recommendations]
-    H --> I[Load dynamic rules from PostgreSQL]
-    I --> J{More dynamic rules?}
-    J -->|No| R[Build RecommendationResponse]
-    J -->|Yes| K[Evaluate each condition]
-    K --> L[Apply negate to condition result]
-    L --> M{Do all conditions match?}
-    M -->|No| J
-    M -->|Yes| N[Add dynamic recommendation]
-    N --> O[Increment rule hit counter]
+    D --> G[Проверить все наборы фиксированных правил]
+    G --> H[Добавить совпавшие фиксированные рекомендации]
+    H --> I[Загрузить динамические правила из PostgreSQL]
+    I --> J{Остались динамические правила?}
+    J -->|Нет| R[Сформировать RecommendationResponse]
+    J -->|Да| K[Проверить каждое условие]
+    K --> L[Применить negate к результату условия]
+    L --> M{Совпали все условия?}
+    M -->|Нет| J
+    M -->|Да| N[Добавить динамическую рекомендацию]
+    N --> O[Увеличить счётчик срабатываний правила]
     O --> J
-    R --> S([HTTP 200 response])
+    R --> S([Ответ HTTP 200])
 ```
 
 ## Компоненты
@@ -88,7 +88,7 @@ flowchart TD
 | Компонент | Ответственность |
 |---|---|
 | RecommendationController | REST endpoint получения рекомендаций |
-| RecommendationService | Оркестрация статических и динамических правил |
+| RecommendationService | Координация фиксированных и динамических правил |
 | RecommendationRepository | Агрегация транзакций в H2 и кеширование метрик |
 | RecommendationRuleSet | Контракт фиксированного правила |
 | DynamicRuleController | CRUD динамических правил и выдача статистики |
@@ -98,15 +98,15 @@ flowchart TD
 | CacheManagementService | Очистка всех компонентов, реализующих CacheClearable |
 | ManagementInfoController | Выдача Maven artifactId и version из BuildProperties |
 | TelegramUpdateHandler | Обработка /recommend username с проверкой allowlist |
-| TelegramUserRepository | Поиск единственного пользователя в read-only H2 |
+| TelegramUserRepository | Поиск единственного пользователя в H2, доступной только для чтения |
 
 ## Хранилища и внешние системы
 
-- H2 содержит исходные таблицы клиентов, продуктов и транзакций. Приложение подключается к ней в режиме read-only.
-- PostgreSQL хранит динамические правила и статистику. Структура создаётся Liquibase.
+- H2 содержит исходные таблицы клиентов, продуктов и транзакций. Приложение подключается к ней в режиме «только чтение».
+- PostgreSQL хранит динамические правила и статистику. Структура создаётся с помощью Liquibase.
 - Telegram Bot API доставляет updates и принимает исходящие сообщения. Бот запускается только при наличии токена.
-- Caffeine хранит агрегированные метрики клиента в памяти процесса; TTL 10 минут, максимальный размер 10 000 записей.
+- Caffeine хранит агрегированные метрики клиента в памяти процесса; TTL составляет 10 минут, максимальный размер — 10 000 записей.
 
 ## Потоки данных
 
-REST и Telegram используют один RecommendationService. Telegram не вычисляет правила самостоятельно. Доступ Telegram к поиску клиентов и рекомендациям разрешён только sender ID, перечисленным в TELEGRAM_BOT_ALLOWED_USER_IDS. Пустой список означает запрет доступа всем отправителям.
+REST API и Telegram используют один RecommendationService. Telegram не вычисляет правила самостоятельно. Доступ Telegram к поиску клиентов и рекомендациям разрешён только отправителям, чьи ID перечислены в TELEGRAM_BOT_ALLOWED_USER_IDS. Пустой список означает запрет доступа для всех отправителей.
