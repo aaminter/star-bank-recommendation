@@ -1,103 +1,103 @@
-# Portfolio Case Study: Star Bank Recommendation
+# Описание проекта для портфолио: Star Bank Recommendation
 
-- Status date: 2026-11-23
-- Project type: educational team backend project
-- Role demonstrated: technical coordination, task decomposition, architecture facilitation, code review and integration
-- Contributors: `aaminter`, `tani9kuz-lang`
-- Production status: educational project, not a production system
+- Дата актуальности сведений: 2026-11-23
+- Тип проекта: учебный командный backend-проект
+- Демонстрируемая роль: техническая координация, декомпозиция задач, содействие в принятии архитектурных решений, проверка кода и интеграция
+- Участники: `aaminter`, `tani9kuz-lang`
+- Статус эксплуатации: учебный проект, не промышленная система
 
-## Project outcome
+## Результат проекта
 
-The team extended a recommendation backend with independently developed dynamic-rule storage and evaluation, integrated the modules into the recommendation API, added operational endpoints and Telegram integration, and established a reviewed Pull Request workflow with automated CI.
+Команда расширила рекомендательный backend: реализовала независимо разрабатываемые хранилище и механизм вычисления динамических правил, интегрировала модули с API рекомендаций, добавила служебные endpoints и интеграцию с Telegram, а также организовала процесс Pull Request с проверкой изменений и автоматизированным CI.
 
-The supplied H2 transaction/product database remains read-only. Dynamic rules and their statistics are stored separately in PostgreSQL, with Liquibase-managed schema changes.
+Предоставленная база H2 с транзакциями и продуктами осталась доступной только для чтения. Динамические правила и статистика их срабатываний хранятся отдельно в PostgreSQL; изменения схемы управляются Liquibase.
 
-## Technical result
+## Технический результат
 
-- Java 17 and Spring Boot 4.1.2.
-- Spring MVC REST API.
-- H2 as a read-only source of customer, product and transaction data.
-- Separate PostgreSQL storage for dynamic rules and statistics.
-- Spring Data JPA and Liquibase for persistence and migrations.
-- Fixed recommendation rules retained alongside dynamic rules.
-- Dynamic condition evaluation with AND composition and per-condition `negate`.
-- Caffeine caching of customer metrics and cache management.
-- Rule-hit statistics.
-- Telegram operator flow using the shared recommendation service and private-chat restrictions.
-- Management endpoints for cache clearing and build information.
-- Unit, MVC and integration tests; GitHub Actions CI on Java 17.
+- Java 17 и Spring Boot 4.1.2.
+- REST API на Spring MVC.
+- H2 как источник данных о клиентах, продуктах и транзакциях, доступный только для чтения.
+- Отдельное хранилище динамических правил и статистики на PostgreSQL.
+- Spring Data JPA и Liquibase для хранения данных и миграций.
+- Фиксированные правила рекомендаций сохранены наряду с динамическими.
+- Вычисление динамических условий с объединением AND и индивидуальным флагом `negate` для каждого условия.
+- Кеширование метрик клиентов с помощью Caffeine и управление кешем.
+- Статистика срабатываний правил.
+- Сценарий работы оператора через Telegram с использованием общего сервиса рекомендаций и ограничением доступа к личным чатам.
+- Служебные endpoints для очистки кеша и получения информации о сборке.
+- Модульные, MVC- и интеграционные тесты; CI GitHub Actions на Java 17.
 
-## Ownership and delivery
+## Ответственность и выполненная работа
 
-| Contributor | Delivered scope | Evidence |
+| Участник | Выполненный объём | Подтверждение |
 |---|---|---|
-| `tani9kuz-lang` | PostgreSQL/JPA persistence, Liquibase, dynamic-rule CRUD and validation; statistics and management-info work | [Issue #4](https://github.com/aaminter/star-bank-recommendation/issues/4), [Issue #20](https://github.com/aaminter/star-bank-recommendation/issues/20), [Issue #24](https://github.com/aaminter/star-bank-recommendation/issues/24), [PR #25](https://github.com/aaminter/star-bank-recommendation/pull/25) |
-| `aaminter` | Dynamic-rule engine, metrics caching, recommendation integration, statistics integration, Telegram and management endpoints, CI | [Issue #8](https://github.com/aaminter/star-bank-recommendation/issues/8), [Issue #10](https://github.com/aaminter/star-bank-recommendation/issues/10), [Issue #21](https://github.com/aaminter/star-bank-recommendation/issues/21), [Issue #22](https://github.com/aaminter/star-bank-recommendation/issues/22), [Issue #23](https://github.com/aaminter/star-bank-recommendation/issues/23), [Issue #16](https://github.com/aaminter/star-bank-recommendation/issues/16), [PR #26](https://github.com/aaminter/star-bank-recommendation/pull/26), [PR #29](https://github.com/aaminter/star-bank-recommendation/pull/29), [PR #30](https://github.com/aaminter/star-bank-recommendation/pull/30), [PR #31](https://github.com/aaminter/star-bank-recommendation/pull/31), [PR #33](https://github.com/aaminter/star-bank-recommendation/pull/33) |
-| Both contributors | Task ownership, architecture decisions, end-to-end integration and retrospective | [Issue #14](https://github.com/aaminter/star-bank-recommendation/issues/14), [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15), [Issue #13](https://github.com/aaminter/star-bank-recommendation/issues/13), [Issue #17](https://github.com/aaminter/star-bank-recommendation/issues/17) |
+| `tani9kuz-lang` | Хранение данных через PostgreSQL/JPA, Liquibase, CRUD и валидация динамических правил; работа над статистикой и сведениями о сборке приложения | [Issue #4](https://github.com/aaminter/star-bank-recommendation/issues/4), [Issue #20](https://github.com/aaminter/star-bank-recommendation/issues/20), [Issue #24](https://github.com/aaminter/star-bank-recommendation/issues/24), [PR #25](https://github.com/aaminter/star-bank-recommendation/pull/25) |
+| `aaminter` | Механизм вычисления динамических правил, кеширование метрик, интеграция с сервисом рекомендаций, интеграция статистики, Telegram и служебные endpoints, CI | [Issue #8](https://github.com/aaminter/star-bank-recommendation/issues/8), [Issue #10](https://github.com/aaminter/star-bank-recommendation/issues/10), [Issue #21](https://github.com/aaminter/star-bank-recommendation/issues/21), [Issue #22](https://github.com/aaminter/star-bank-recommendation/issues/22), [Issue #23](https://github.com/aaminter/star-bank-recommendation/issues/23), [Issue #16](https://github.com/aaminter/star-bank-recommendation/issues/16), [PR #26](https://github.com/aaminter/star-bank-recommendation/pull/26), [PR #29](https://github.com/aaminter/star-bank-recommendation/pull/29), [PR #30](https://github.com/aaminter/star-bank-recommendation/pull/30), [PR #31](https://github.com/aaminter/star-bank-recommendation/pull/31), [PR #33](https://github.com/aaminter/star-bank-recommendation/pull/33) |
+| Оба участника | Распределение задач, архитектурные решения, сквозная интеграция и ретроспектива | [Issue #14](https://github.com/aaminter/star-bank-recommendation/issues/14), [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15), [Issue #13](https://github.com/aaminter/star-bank-recommendation/issues/13), [Issue #17](https://github.com/aaminter/star-bank-recommendation/issues/17) |
 
-## Code review evidence
+## Подтверждение проверки кода
 
-[PR #25](https://github.com/aaminter/star-bank-recommendation/pull/25) is the primary contributor-owned review example:
+[PR #25](https://github.com/aaminter/star-bank-recommendation/pull/25) является основным примером проверки изменения, выполненного другим участником:
 
-- The PR was authored by `tani9kuz-lang`.
-- The reviewer submitted two formal `CHANGES_REQUESTED` reviews with actionable findings, including credential handling, request validation, deletion semantics, PostgreSQL integration tests and CI configuration.
-- The author responded with implementation fixes; the related review threads were resolved.
-- The reviewer then submitted `APPROVED`; the PR was merged after the checks passed.
-- The final recorded CI result for this PR was 34 tests with no errors.
+- Автором PR была `tani9kuz-lang`.
+- Проверяющий оставил два формальных заключения `CHANGES_REQUESTED` с конкретными замечаниями, в том числе по работе с учётными данными, валидации запросов, семантике удаления, интеграционным тестам PostgreSQL и конфигурации CI.
+- Автор ответил исправлениями в реализации; связанные обсуждения проверки были отмечены как решённые.
+- Затем проверяющий вынес заключение `APPROVED`; PR был объединён после успешного прохождения проверок.
+- В итоговых зафиксированных результатах CI для этого PR указано 34 теста без ошибок.
 
-This provides evidence of contributor ownership, substantive review, feedback resolution and acceptance after verification. It does not imply that every PR in the repository had the same review depth.
+Это подтверждает ответственность участника за результат, содержательную проверку, устранение замечаний и принятие изменения после проверки. Это не означает, что каждый PR репозитория проходил проверку такой же глубины.
 
-## Architecture and team process
+## Архитектура и командный процесс
 
-- [ADR-001](../adr/001-read-only-source-and-dynamic-rule-storage.md): preserve read-only H2 and isolate dynamic rules in PostgreSQL.
-- [ADR-002](../adr/002-dynamic-rule-condition-semantics.md): define AND and `negate` semantics.
-- [ADR-003](../adr/003-local-cache-and-invalidation.md): use bounded local caching with explicit invalidation.
-- The contributor's agreement with all three ADRs is recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
-- Roles and ownership were confirmed in [Issue #14](https://github.com/aaminter/star-bank-recommendation/issues/14).
-- Cross-module integration and regression checks were recorded in [Issue #13](https://github.com/aaminter/star-bank-recommendation/issues/13).
+- [ADR-001](../adr/001-read-only-source-and-dynamic-rule-storage.md): сохранение H2 в режиме «только чтение» и изоляция динамических правил в PostgreSQL.
+- [ADR-002](../adr/002-dynamic-rule-condition-semantics.md): определение семантики AND и `negate`.
+- [ADR-003](../adr/003-local-cache-and-invalidation.md): использование ограниченного локального кеша с явной инвалидацией.
+- Согласие участника со всеми тремя ADR зафиксировано в [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
+- Роли и зоны ответственности подтверждены в [Issue #14](https://github.com/aaminter/star-bank-recommendation/issues/14).
+- Межмодульная интеграция и регрессионные проверки зафиксированы в [Issue #13](https://github.com/aaminter/star-bank-recommendation/issues/13).
 
-## Quality and integration evidence
+## Подтверждение качества и интеграции
 
-- [PR #29](https://github.com/aaminter/star-bank-recommendation/pull/29) integrated the recommendation flow and dynamic-rule engine.
-- [PR #30](https://github.com/aaminter/star-bank-recommendation/pull/30) delivered management endpoints and Telegram integration.
-- [PR #31](https://github.com/aaminter/star-bank-recommendation/pull/31) restricted Telegram recommendation requests to private chats.
-- [PR #33](https://github.com/aaminter/star-bank-recommendation/pull/33) was merged into `main`; the CI workflow now runs for PRs targeting both `main` and `feature/recommendation-rules`.
-- The PR #33 description records 71 tests, zero errors, zero failures and two skipped tests; GitHub Actions checks passed.
-- [PR #35](https://github.com/aaminter/star-bank-recommendation/pull/35) added traceable evidence to the retrospective.
+- [PR #29](https://github.com/aaminter/star-bank-recommendation/pull/29) интегрировал процесс формирования рекомендаций и механизм динамических правил.
+- [PR #30](https://github.com/aaminter/star-bank-recommendation/pull/30) добавил служебные endpoints и интеграцию с Telegram.
+- [PR #31](https://github.com/aaminter/star-bank-recommendation/pull/31) ограничил запросы рекомендаций через Telegram личными чатами.
+- [PR #33](https://github.com/aaminter/star-bank-recommendation/pull/33) был объединён с `main`; теперь CI запускается для PR, направленных как в `main`, так и в `feature/recommendation-rules`.
+- В описании PR #33 зафиксированы 71 тест, ноль ошибок, ноль провалов и два пропущенных теста; проверки GitHub Actions завершились успешно.
+- [PR #35](https://github.com/aaminter/star-bank-recommendation/pull/35) добавил в ретроспективу проверяемые свидетельства выполненной работы.
 
-## Measured process evidence
+## Измеримые свидетельства процесса
 
-The following values are calculated from GitHub timestamps and review records. They describe this project cycle, not a general team-performance benchmark.
+Следующие значения рассчитаны по временным отметкам GitHub и истории проверок. Они описывают этот проектный цикл, а не являются общим нормативом производительности команды.
 
-| Metric | Observed result | Basis |
+| Метрика | Наблюдаемый результат | Основание |
 |---|---:|---|
-| Issue #4 lead time | 24 days, 1 hour, 56 minutes, 53 seconds | Created 2026-10-30 15:30:04 UTC; closed 2026-11-23 17:26:57 UTC |
-| PR #25 time to first substantive review | 17 hours, 5 minutes, 48 seconds | PR opened 2026-11-15 17:06:57 UTC; first review 2026-11-16 10:12:45 UTC |
-| PR #25 time from opening to approval | 5 days, 13 hours, 17 minutes, 22 seconds | PR opened 2026-11-15 17:06:57 UTC; approved 2026-11-21 06:24:19 UTC |
-| PR #25 formal review outcomes | 2 `CHANGES_REQUESTED`, followed by 1 `APPROVED` | GitHub review submissions |
-| PR #25 final recorded test result | 34 tests, no errors | Final review/CI evidence |
-| PR #33 recorded test result | 71 tests, 0 errors, 0 failures, 2 skipped | PR description and successful checks |
+| Время выполнения Issue #4 | 24 дня, 1 час, 56 минут, 53 секунды | Создана 2026-10-30 15:30:04 UTC; закрыта 2026-11-23 17:26:57 UTC |
+| Время до первой содержательной проверки PR #25 | 17 часов, 5 минут, 48 секунд | PR открыт 2026-11-15 17:06:57 UTC; первая проверка 2026-11-16 10:12:45 UTC |
+| Время от открытия PR #25 до одобрения | 5 дней, 13 часов, 17 минут, 22 секунды | PR открыт 2026-11-15 17:06:57 UTC; одобрен 2026-11-21 06:24:19 UTC |
+| Формальные результаты проверки PR #25 | 2 `CHANGES_REQUESTED`, затем 1 `APPROVED` | Отправленные через GitHub заключения проверки |
+| Итоговый зафиксированный результат тестирования PR #25 | 34 теста, без ошибок | Итоговая проверка / CI |
+| Зафиксированный результат тестирования PR #33 | 71 тест, 0 ошибок, 0 провалов, 2 пропущены | Описание PR и успешные проверки |
 
-The available evidence does not provide a consistent project-wide measure for every task's review latency, post-merge defects or acceptance-criteria completion ratio. Those values are not estimated.
+Доступные свидетельства не дают единой полной метрики задержки проверки для каждой задачи, дефектов после слияния или доли выполнения критериев приёмки по всему проекту. Эти значения не оцениваются предположительно.
 
-## Team Lead evidence assessment
+## Оценка свидетельств навыков Team Lead
 
-The repository provides evidence for all five criteria defined in [Issue #18](https://github.com/aaminter/star-bank-recommendation/issues/18):
+Репозиторий содержит свидетельства по всем пяти критериям, определённым в [Issue #18](https://github.com/aaminter/star-bank-recommendation/issues/18):
 
-1. Contributor-owned implementation: demonstrated by the contributor-authored and merged PR #25.
-2. Substantive review and fixes: demonstrated by review submissions, author responses and resolved threads in PR #25.
-3. Agreed architecture: demonstrated by Accepted ADRs and the contributor's explicit confirmation in Issue #15.
-4. Integration and regression control: demonstrated by Issue #13 and merged integration PRs.
-5. Quality and learning: demonstrated by successful CI, protected-branch workflow, and the retrospective with five follow-up actions.
+1. Самостоятельная реализация участником: подтверждается PR #25, созданным участником и объединённым с основной ветвью.
+2. Содержательная проверка и исправления: подтверждаются заключениями проверки, ответами автора и решёнными обсуждениями в PR #25.
+3. Согласованная архитектура: подтверждается принятыми ADR и явным подтверждением участника в Issue #15.
+4. Интеграция и регрессионный контроль: подтверждаются Issue #13 и объединёнными интеграционными PR.
+5. Качество и обучение на опыте: подтверждаются успешным CI, процессом работы с защищённой ветвью и ретроспективой с пятью последующими действиями.
 
-**Assessment boundary:** this is evidence of technical leadership practices in one educational team project. It is not evidence of production Team Lead employment or long-term leadership across multiple teams.
+**Границы оценки:** это свидетельства применения практик технического лидерства в одном учебном командном проекте. Они не подтверждают опыт работы Team Lead в промышленной эксплуатации или длительное руководство несколькими командами.
 
-## Project documentation
+## Документация проекта
 
 - [README](../../README.md)
-- [Architecture and diagrams](../architecture.md)
-- [Requirements and Issue traceability](../requirements.md)
-- [Deployment guide](../deployment.md)
-- [OpenAPI specification](../openapi.yaml)
-- [Retrospective](../retrospective.md)
-- [Team Lead evidence sprint](team-lead-evidence-sprint.md)
+- [Архитектура и диаграммы](../architecture.md)
+- [Требования и связь с Issues](../requirements.md)
+- [Руководство по развёртыванию](../deployment.md)
+- [Спецификация OpenAPI](../openapi.yaml)
+- [Ретроспектива](../retrospective.md)
+- [Свидетельства навыков Team Lead за проектный цикл](team-lead-evidence-sprint.md)
