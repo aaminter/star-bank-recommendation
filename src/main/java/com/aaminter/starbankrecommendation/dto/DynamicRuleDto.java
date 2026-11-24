@@ -5,16 +5,19 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Request and response representation of a dynamic recommendation rule.
  * Validation constraints define the required product fields and conditions.
- */
-/**
- * Request and response representation of a dynamic recommendation rule.
- * Validation constraints define the required product fields and conditions.
+ *
+ * @param id database identifier; null when creating a new rule
+ * @param productName product display name
+ * @param productId UUID of the recommended product
+ * @param productText recommendation text shown to the customer
+ * @param rule conditions that must be evaluated for the recommendation
  */
 public record DynamicRuleDto(
         Long id,
@@ -32,6 +35,5 @@ public record DynamicRuleDto(
         String productText,
 
         @NotEmpty(message = "Правило должно содержать хотя бы одно условие")
-
         List<@Valid RuleQueryDto> rule
 ) {}
