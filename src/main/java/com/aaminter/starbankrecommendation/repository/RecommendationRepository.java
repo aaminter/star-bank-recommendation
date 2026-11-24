@@ -123,6 +123,12 @@ public class RecommendationRepository implements CacheClearable {
         );
     }
 
+    /**
+     * Executes the aggregate query and maps its result to customer metrics grouped by product type.
+     *
+     * @param userId UUID of the customer whose transactions are aggregated
+     * @return aggregated metrics, or empty metrics when the query returns no row
+     */
     private CustomerMetrics loadCustomerMetrics(UUID userId) {
         List<CustomerMetrics> results = jdbcTemplate.query(
                 FIND_CUSTOMER_METRICS_SQL,
