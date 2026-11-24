@@ -1,31 +1,31 @@
-# Code Review Guidelines
+# Правила проверки кода
 
-## Review goals
+## Цели проверки
 
-Review for correctness, maintainability, compatibility, security, and test quality. A review is not a style contest.
+Проверяйте корректность, сопровождаемость, совместимость, безопасность и качество тестов. Проверка кода не должна превращаться в соревнование по стилю.
 
-## Checklist
+## Контрольный список
 
-- Does the implementation satisfy the Issue acceptance criteria?
-- Are edge cases and invalid input handled?
-- Are names, abstractions, and responsibilities clear?
-- Are database changes backward-compatible and reproducible?
-- Are secrets and sensitive data excluded?
-- Are tests meaningful and deterministic?
-- Does the change preserve fixed recommendation behavior?
-- Are errors observable without leaking sensitive information?
-- Is documentation updated where contracts or setup changed?
+- Соответствует ли реализация критериям приёмки GitHub Issue?
+- Обработаны ли граничные случаи и некорректные входные данные?
+- Понятны ли имена, абстракции и зоны ответственности?
+- Обеспечивают ли изменения базы данных обратную совместимость и воспроизводимость?
+- Исключены ли секреты и конфиденциальные данные?
+- Являются ли тесты содержательными и детерминированными?
+- Сохраняет ли изменение поведение фиксированных рекомендаций?
+- Можно ли обнаружить ошибки, не раскрывая конфиденциальную информацию?
+- Обновлена ли документация, если изменились контракты или порядок настройки?
 
-## Review comments
+## Замечания при проверке
 
-Use three categories:
+Используйте три категории:
 
-- **Blocking**: correctness, security, data loss, broken contract, or missing required tests.
-- **Suggestion**: a concrete improvement that is not required for merge.
-- **Question**: clarification needed to understand the design.
+- **Блокирующее замечание**: ошибка корректности, проблема безопасности, потеря данных, нарушение контракта или отсутствие обязательных тестов.
+- **Предложение**: конкретное улучшение, которое не является обязательным условием слияния.
+- **Вопрос**: уточнение, необходимое для понимания проектного решения.
 
-Every blocking comment should explain the risk and, where possible, suggest a direction for correction.
+Каждое блокирующее замечание должно объяснять риск и, по возможности, предлагать направление исправления.
 
-## Author responsibilities
+## Обязанности автора
 
-The author responds to review comments, updates the branch, and explains any rejected suggestion with technical reasoning. Resolve conversations only after the issue is addressed or explicitly agreed.
+Автор отвечает на замечания, обновляет ветвь и объясняет техническими аргументами, если отклоняет предложение. Обсуждение следует помечать как решённое только после устранения проблемы или явного согласования решения.
