@@ -17,22 +17,10 @@ import java.util.stream.Collectors;
 /**
  * Creates and configures the Telegram bot when its token property is present.
  */
-/**
- * Creates and configures the Telegram bot when its token property is present.
- */
 @Configuration
 @ConditionalOnProperty(name = "telegram.bot.token")
 public class TelegramBotConfiguration {
 
-    /**
-     * Creates the Telegram bot and registers its update handler.
-     *
-     * @param token Telegram bot token
-     * @param allowedUserIds comma-separated Telegram sender IDs allowed to use the bot
-     * @param userRepository repository used to look up Telegram users
-     * @param recommendationService service used to generate recommendations
-     * @return configured Telegram bot
-     */
     /**
      * Creates the Telegram bot and registers its update handler.
      *
