@@ -1,19 +1,19 @@
-# Security Policy
+# Политика безопасности
 
-## Scope
+## Область применения
 
-This is an educational project. Do not use it to process real customer data or production credentials.
+Это учебный проект. Не используйте его для обработки реальных данных клиентов или учётных данных промышленной среды.
 
-## Reporting a vulnerability
+## Сообщение об уязвимости
 
-Do not publish credentials, exploit details, personal data, or a live vulnerability in a public issue.
+Не публикуйте учётные данные, сведения об эксплуатации уязвимости, персональные данные или сведения о действующей уязвимости в общедоступной задаче.
 
-Use GitHub's private vulnerability reporting feature if it is enabled for this repository. If it is unavailable, contact the repository owner through the GitHub profile and provide only the minimum information needed to coordinate a private report.
+Если для репозитория включена функция приватного сообщения об уязвимостях GitHub, воспользуйтесь ею. Если она недоступна, свяжитесь с владельцем репозитория через его профиль GitHub и передайте только минимальный объём информации, необходимый для приватного взаимодействия.
 
-## Secrets and sensitive data
+## Секреты и конфиденциальные данные
 
-- Store credentials in environment variables or a secret manager.
-- Never commit real tokens, passwords, private keys, database dumps, or personal data.
-- Treat any credential committed to Git as compromised, even if it was later deleted from the current branch.
-- Rotate exposed credentials at the issuing system before considering history cleanup.
-- Coordinate history rewrites with contributors because existing clones and branches may need to be recreated.
+- Храните учётные данные в переменных окружения или менеджере секретов.
+- Никогда не добавляйте в репозиторий действующие токены, пароли, закрытые ключи, дампы баз данных или персональные данные.
+- Считайте любые учётные данные, попавшие в Git, скомпрометированными, даже если впоследствии они были удалены из текущей ветви.
+- Прежде чем очищать историю Git, отзовите или замените раскрытые учётные данные в системе, которая их выдала.
+- Согласовывайте переписывание истории с участниками: существующие локальные копии и ветви может потребоваться создать заново.
