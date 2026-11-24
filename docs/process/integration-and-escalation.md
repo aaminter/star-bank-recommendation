@@ -1,44 +1,44 @@
-# Integration and Escalation
+# Интеграция и эскалация проблем
 
-## Module ownership
+## Ответственность за модули
 
-Each Issue has one directly responsible owner. The owner is accountable for implementation, tests, and raising blockers. The coordinator manages dependencies and integration visibility; this does not transfer implementation ownership from the task owner.
+У каждой Issue есть один непосредственно ответственный исполнитель. Он отвечает за реализацию, тесты и своевременное сообщение о блокирующих обстоятельствах. Координатор управляет зависимостями и контролирует ход интеграции, но не забирает у исполнителя ответственность за реализацию.
 
-## Contract-first integration
+## Сначала контракт, затем интеграция
 
-Before parallel work begins, agree on:
+До начала параллельной работы согласуйте:
 
-- endpoint paths and HTTP status codes;
-- request/response JSON and validation errors;
-- identifiers and database ownership;
-- condition names, operand types, and composition semantics;
-- exception mapping and logging expectations;
-- tests that prove compatibility.
+- пути endpoint и коды состояния HTTP;
+- JSON-структуры запросов и ответов, а также ошибки валидации;
+- идентификаторы и принадлежность баз данных;
+- названия условий, типы операндов и семантику объединения;
+- правила преобразования исключений и требования к журналированию;
+- тесты, подтверждающие совместимость.
 
-Record material architectural decisions in `docs/adr/`. Proposed ADRs remain Proposed until contributors confirm them.
+Существенные архитектурные решения фиксируйте в `docs/adr/`. Предлагаемые ADR сохраняют статус Proposed до подтверждения участниками.
 
-## Integration sequence
+## Последовательность интеграции
 
-1. Agree on the contract and acceptance criteria.
-2. Implement modules on separate feature branches.
-3. Open focused PRs and run CI.
-4. Review each module against its Issue.
-5. Merge in dependency order.
-6. Run the full verification suite after integration.
-7. Record defects and follow-up work in Issues.
+1. Согласовать контракт и критерии приёмки.
+2. Реализовать модули в отдельных feature-ветвях.
+3. Открыть тематически сфокусированные PR и запустить CI.
+4. Проверить каждый модуль на соответствие его Issue.
+5. Выполнить слияние с учётом порядка зависимостей.
+6. После интеграции запустить полный набор проверок.
+7. Зафиксировать дефекты и последующие задачи в Issues.
 
-## Escalation
+## Эскалация
 
-Raise a blocker when a dependency, contract, environment, or failing test prevents progress. A useful blocker report contains:
+Сообщайте о блокирующей проблеме, если зависимость, контракт, окружение или упавший тест препятствуют продвижению. Полезное сообщение о блокировке содержит:
 
-- what is blocked;
-- the exact expected behavior;
-- what was tried and the observed result;
-- the decision or help needed;
-- the impact on dependent work.
+- что именно заблокировано;
+- какое поведение ожидалось;
+- что было предпринято и какой результат наблюдался;
+- какое решение или содействие требуется;
+- как проблема влияет на зависимые задачи.
 
-Do not silently change a shared contract or bypass a failing check to preserve a date. Re-plan the dependent work and update the Issue.
+Не меняйте молча общий контракт и не обходите упавшую проверку ради соблюдения даты. Пересмотрите план зависимых работ и обновите Issue.
 
-## Completion evidence
+## Подтверждение завершения
 
-Use merged PRs, CI results, tests, and issue closure criteria as evidence. A target date in an Issue is a planning estimate, not proof of completion.
+Используйте объединённые PR, результаты CI, тесты и критерии закрытия Issue как подтверждение выполнения. Целевая дата в Issue является плановой оценкой, а не доказательством завершения.
