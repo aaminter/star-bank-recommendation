@@ -17,6 +17,7 @@
 - Статистика срабатываний динамических правил.
 - Telegram-бот для операторского поиска рекомендаций по username.
 - Management endpoints для очистки кешей и получения Maven Build Info.
+- Интерактивная документация REST API на Swagger UI (springdoc-openapi).
 - Unit- и integration-тесты; CI на Java 17.
 
 ## Архитектура и документация
@@ -24,11 +25,18 @@
 - [Архитектура и диаграммы](docs/architecture.md)
 - [Требования, User Stories и трассировка Issues](docs/requirements.md)
 - [Развёртывание и конфигурация](docs/deployment.md)
+- [Интерактивная документация REST API (Swagger UI)](http://localhost:8080/swagger-ui.html)
 - [Спецификация OpenAPI](docs/openapi.yaml)
 - [Портфолио: Case Study](docs/portfolio/case-study.md)
 - [Ретроспектива командной разработки](docs/retrospective.md)
 
 ## REST API
+
+После запуска приложения интерактивная документация доступна по адресу:
+
+`http://localhost:8080/swagger-ui.html`
+
+Springdoc формирует OpenAPI-описание на основе REST-контроллеров приложения. JSON-спецификация доступна по адресу `/v3/api-docs`, YAML-спецификация — по адресу `/v3/api-docs.yaml`.
 
 | Метод | Endpoint | Назначение |
 |---|---|---|
@@ -40,7 +48,7 @@
 | POST | `/management/clear-caches` | Очистить все зарегистрированные кеши |
 | GET | `/management/info` | Получить artifactId и версию приложения |
 
-Полная схема запросов и ответов находится в [OpenAPI-файле](docs/openapi.yaml).
+Ручная спецификация с примерами запросов и ответов находится в [OpenAPI-файле](docs/openapi.yaml).
 
 ## Ключевые архитектурные ограничения
 
