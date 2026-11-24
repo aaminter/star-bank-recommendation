@@ -1,45 +1,45 @@
-# ADR-002: Define composition and negation semantics for dynamic rule conditions
+# ADR-002: Определение логики объединения и отрицания условий динамических правил
 
-- Status: Accepted
-- Date: 2026-10-31
-- Participants: `aaminter`, `tani9kuz-lang`; agreement recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
+- Статус: Принято
+- Дата: 2026-10-31
+- Участники: `aaminter`, `tani9kuz-lang`; согласование зафиксировано в [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
 
-## Context
+## Контекст
 
-Dynamic rules may contain more than one condition. The evaluator needs deterministic semantics for combining conditions and for expressing negative matches. Without an explicit contract, CRUD, evaluator, tests, and API clients can interpret the same JSON differently.
+Динамическое правило может содержать несколько условий. Механизму вычисления необходимо однозначно определять, как объединять условия и как задавать отрицательные совпадения. Без явного контракта CRUD, механизм вычисления, тесты и клиенты API могут по-разному интерпретировать один и тот же JSON.
 
-## Options considered
+## Рассмотренные варианты
 
-1. Treat all conditions as OR.
-   - Benefit: broad matching and simple implementation.
-   - Drawback: can produce recommendations when only one of several required constraints is true.
-2. Treat all conditions as AND.
-   - Benefit: a rule matches only when every declared condition is satisfied.
-   - Drawback: users need separate rules for alternative paths.
-3. Support an explicit composition operator such as AND/OR.
-   - Benefit: flexible rule expressions.
-   - Drawback: increases schema and evaluator complexity.
+1. Объединять все условия через OR.
+   - Преимущество: широкий охват совпадений и простая реализация.
+   - Недостаток: рекомендация может быть выдана, даже если истинно только одно из нескольких обязательных ограничений.
+2. Объединять все условия через AND.
+   - Преимущество: правило срабатывает только тогда, когда выполнено каждое объявленное условие.
+   - Недостаток: для альтернативных сценариев пользователям придётся создавать отдельные правила.
+3. Поддержать явный оператор объединения, например AND/OR.
+   - Преимущество: гибкие выражения правил.
+   - Недостаток: повышается сложность схемы данных и механизма вычисления.
 
-## Accepted decision
+## Принятое решение
 
-For the first version, treat the condition list as AND: every condition must evaluate to true. Add a boolean `negate` flag to an individual condition; when true, invert that condition's result before applying the AND composition.
+В первой версии список условий трактуется как AND: каждое условие должно вычислиться в true. Для отдельного условия добавляется логический флаг `negate`; если он равен true, результат этого условия инвертируется до применения общего AND.
 
-An empty condition list is invalid and must be rejected by dynamic-rule validation before persistence. As a defensive measure, the evaluator also returns `false` when it receives an empty condition list.
+Пустой список условий недопустим и должен отклоняться при проверке динамического правила до сохранения. В качестве дополнительной защиты механизм вычисления также возвращает `false`, если получает пустой список условий.
 
-This is a first-version decision, not a claim that arbitrary nested boolean expressions are supported.
+Это решение относится к первой версии и не означает поддержку произвольных вложенных логических выражений.
 
-## Consequences
+## Последствия
 
-### Positive
-- The first version has deterministic and testable behavior.
-- CRUD validation and evaluator implementation can share one contract.
-- Boundary and negative cases can be expressed explicitly.
+### Положительные
+- Поведение первой версии однозначно и допускает тестирование.
+- Проверка CRUD и реализация механизма вычисления используют единый контракт.
+- Граничные и отрицательные сценарии можно выразить явно.
 
-### Trade-offs
-- OR and nested expressions are not supported in the first version.
-- A future schema extension may be required if business rules need more complex logic.
+### Компромиссы
+- В первой версии не поддерживаются OR и вложенные выражения.
+- Если бизнес-правилам потребуется более сложная логика, может понадобиться расширение схемы данных.
 
-### Follow-up
-- [x] Add examples and condition-composition semantics to the OpenAPI contract.
-- [x] Test empty condition lists, one condition, multiple conditions, negate true/false, and mixed results.
-- [x] Decide explicitly that an empty list is invalid and does not match.
+### Последующие действия
+- [x] Добавить примеры и семантику объединения условий в контракт OpenAPI.
+- [x] Проверить пустые списки условий, одно условие, несколько условий, `negate=true/false` и смешанные результаты.
+- [x] Явно зафиксировать, что пустой список недопустим и не приводит к срабатыванию правила.
