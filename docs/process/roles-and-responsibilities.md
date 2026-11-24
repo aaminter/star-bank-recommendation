@@ -1,49 +1,49 @@
-# Roles and Responsibilities
+# Роли и ответственность
 
-- Status: Working agreement, pending confirmation by both contributors
-- Updated: 2026-10-31
+- Статус: рабочее соглашение, ожидает подтверждения обоими участниками
+- Обновлено: 2026-10-31
 
-## Current task ownership
+## Текущее распределение задач
 
-| Area | Owner | Scope |
+| Область | Ответственный | Объём работ |
 |---|---|---|
-| Separate PostgreSQL datasource, DynamicRule persistence, Liquibase migrations, CRUD REST API and tests | `tani9kuz-lang` | Issue #4 |
-| Dynamic condition handlers, comparison operators, AND/negate semantics, Caffeine cache and engine tests | `aaminter` | Issue #8 |
-| Integration of dynamic rules into `GET /recommendation/{user_id}` | `aaminter` | Issue #10 |
-| End-to-end integration and joint acceptance | Both contributors | Issue #13 |
+| Отдельный источник данных PostgreSQL, хранение DynamicRule, миграции Liquibase, CRUD REST API и тесты | `tani9kuz-lang` | Issue #4 |
+| Обработчики условий динамических правил, операторы сравнения, семантика AND/negate, кеш Caffeine и тесты механизма вычисления | `aaminter` | Issue #8 |
+| Интеграция динамических правил в `GET /recommendation/{user_id}` | `aaminter` | Issue #10 |
+| Сквозная интеграция и совместная приёмка | Оба участника | Issue #13 |
 
-The current split reflects the consolidated GitHub Issues. Earlier task ranges (#5–#7 and #8–#12) are no longer used as the ownership reference.
+Текущее распределение отражает объединённые GitHub Issues. Более ранние диапазоны задач (#5–#7 и #8–#12) больше не используются как источник сведений об ответственности.
 
-## Coordination
+## Координация
 
-The project coordinator maintains:
-- dependency visibility and integration order;
-- shared contracts and cross-module questions;
-- CI/review readiness;
-- blocker tracking and follow-up Issues.
+Координатор проекта отвечает за:
+- видимость зависимостей и порядок интеграции;
+- общие контракты и вопросы взаимодействия модулей;
+- готовность CI и проверки кода;
+- отслеживание блокирующих обстоятельств и последующих задач.
 
-Each module owner maintains:
-- implementation decisions within the agreed contract;
-- tests and documentation for the module;
-- progress updates and early blocker escalation;
-- responses to review comments.
+Ответственный за модуль отвечает за:
+- решения по реализации в рамках согласованного контракта;
+- тесты и документацию своего модуля;
+- обновление статуса и своевременное сообщение о блокирующих обстоятельствах;
+- ответы на замечания при проверке кода.
 
-The coordinator does not silently make implementation decisions inside another contributor's module. Contract changes are discussed with the affected owner.
+Координатор не принимает молча решения по реализации внутри модуля другого участника. Изменения контрактов обсуждаются с ответственным за затронутый модуль.
 
-## Review and integration
+## Проверка кода и интеграция
 
-- Every feature change is proposed through a Pull Request.
-- A contributor other than the author reviews the change before merge.
-- Blocking correctness, security, compatibility, and required-test issues must be resolved before merge.
-- The full integration is accepted jointly against Issue #13.
+- Каждое функциональное изменение предлагается через Pull Request.
+- До слияния изменение проверяет участник, отличный от автора.
+- Блокирующие проблемы корректности, безопасности, совместимости и обязательных тестов должны быть устранены до слияния.
+- Полная интеграция принимается совместно по критериям Issue #13.
 
-## Blocker escalation
+## Эскалация блокирующих проблем
 
-When blocked, report the expected behavior, observed result, attempted steps, decision needed, and impact on dependent tasks. Update the relevant Issue rather than hiding schedule risk.
+При возникновении блокировки сообщите ожидаемое поведение, наблюдаемый результат, предпринятые шаги, требуемое решение и влияние на зависимые задачи. Обновите соответствующую Issue, а не скрывайте риск для сроков.
 
-## Confirmation required
+## Требуется подтверждение
 
-- [ ] Both contributors confirm the current ownership split.
-- [ ] Agree review response expectations.
-- [ ] Agree who merges PRs and handles urgent integration conflicts.
-- [ ] Revisit ownership if dates or scope change.
+- [ ] Оба участника подтверждают текущее распределение ответственности.
+- [ ] Согласованы ожидания по срокам ответа на замечания.
+- [ ] Согласовано, кто выполняет слияние PR и разрешает срочные конфликты интеграции.
+- [ ] Распределение ответственности пересматривается при изменении сроков или объёма работ.
