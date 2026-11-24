@@ -19,6 +19,12 @@ final class DynamicRuleValidator {
     private DynamicRuleValidator() {
     }
 
+    /**
+     * Validates every condition's query type, argument count, and argument values.
+     *
+     * @param conditions conditions submitted for a dynamic rule
+     * @throws IllegalArgumentException if the list is empty or any condition is unsupported or malformed
+     */
     static void validate(List<RuleQueryDto> conditions) {
         if (conditions == null || conditions.isEmpty()) {
             throw new IllegalArgumentException(
@@ -64,6 +70,13 @@ final class DynamicRuleValidator {
         }
     }
 
+    /**
+     * Checks that a condition supplies the exact number of arguments required by its query.
+     *
+     * @param condition condition being validated
+     * @param expected required number of arguments
+     * @throws IllegalArgumentException if the actual and expected counts differ
+     */
     private static void requireArgumentCount(
             RuleQueryDto condition,
             int expected
@@ -77,6 +90,12 @@ final class DynamicRuleValidator {
         }
     }
 
+    /**
+     * Verifies that an argument names a supported product type.
+     *
+     * @param value product type name to validate
+     * @throws IllegalArgumentException if the value is null or unsupported
+     */
     private static void parseProductType(String value) {
         try {
             ProductType.valueOf(value);
@@ -88,6 +107,12 @@ final class DynamicRuleValidator {
         }
     }
 
+    /**
+     * Verifies that an argument names a supported transaction type.
+     *
+     * @param value transaction type name to validate
+     * @throws IllegalArgumentException if the value is null or unsupported
+     */
     private static void parseTransactionType(String value) {
         try {
             TransactionType.valueOf(value);
@@ -99,6 +124,12 @@ final class DynamicRuleValidator {
         }
     }
 
+    /**
+     * Verifies that the comparison operator is supported by the rule engine.
+     *
+     * @param operator comparison operator to validate
+     * @throws IllegalArgumentException if the operator is null or unsupported
+     */
     private static void validateOperator(String operator) {
         if (!COMPARISON_OPERATORS.contains(operator)) {
             throw new IllegalArgumentException(
@@ -107,6 +138,12 @@ final class DynamicRuleValidator {
         }
     }
 
+    /**
+     * Verifies that a threshold is a non-negative integer within the {@link Integer} range.
+     *
+     * @param value threshold argument to validate
+     * @throws IllegalArgumentException if the value is malformed or exceeds the integer range
+     */
     private static void validateThreshold(String value) {
         if (value == null || !value.matches("\\d+")) {
             throw new IllegalArgumentException(
