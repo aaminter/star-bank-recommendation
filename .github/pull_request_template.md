@@ -1,30 +1,30 @@
-## Summary
+## Краткое описание
 
-<!-- What changed and why? -->
+<!-- Что изменено и почему? -->
 
-## Related issue
+## Связанная задача
 
-Closes #
+Закрывает #
 
-## Design and impact
+## Проектные решения и влияние изменений
 
-- [ ] Existing fixed recommendation rules remain compatible.
-- [ ] Supplied H2 database remains read-only.
-- [ ] Dynamic rule changes use the separate configuration store.
-- [ ] API/data contracts and configuration are documented.
-- [ ] No secrets, local DB files, or personal data are included.
+- [ ] Существующие фиксированные правила рекомендаций остаются совместимыми.
+- [ ] Предоставленная база данных H2 остаётся доступной только для чтения.
+- [ ] Изменения динамических правил выполняются в отдельном хранилище конфигурации.
+- [ ] Контракты API, данных и конфигурация документированы.
+- [ ] В изменения не включены секреты, локальные файлы БД или персональные данные.
 
-## Verification
+## Проверка
 
 - [ ] `mvn --batch-mode --no-transfer-progress clean verify`
-- [ ] Unit tests added/updated.
-- [ ] Integration tests added/updated where applicable.
-- [ ] CI checks pass.
+- [ ] Добавлены или обновлены модульные тесты.
+- [ ] Добавлены или обновлены интеграционные тесты, если применимо.
+- [ ] Проверки CI завершились успешно.
 
-Test evidence:
+Подтверждение тестирования:
 
-<!-- Paste commands/results, not secrets or sensitive data. -->
+<!-- Приведите команды и результаты, не указывая секреты или конфиденциальные данные. -->
 
-## Review notes
+## Примечания для проверки
 
-<!-- Risks, trade-offs, migration steps, rollback considerations, open questions. -->
+<!-- Риски, компромиссы, шаги миграции, варианты отката, открытые вопросы. -->
