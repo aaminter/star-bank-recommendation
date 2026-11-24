@@ -52,42 +52,92 @@ public class DynamicRule {
         this.rule = rule;
     }
 
+    /**
+     * Returns the database identifier of this dynamic rule.
+     *
+     * @return dynamic rule identifier
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Sets the database identifier of this dynamic rule.
+     *
+     * @param id dynamic rule identifier
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * Returns the UUID of the recommended product.
+     *
+     * @return product UUID
+     */
     public UUID getProductId() {
         return productId;
     }
 
+    /**
+     * Sets the UUID of the recommended product.
+     *
+     * @param productId product UUID
+     */
     public void setProductId(UUID productId) {
         this.productId = productId;
     }
 
+    /**
+     * Returns the display name of the recommended product.
+     *
+     * @return product display name
+     */
     public String getProductName() {
         return productName;
     }
 
+    /**
+     * Sets the display name of the recommended product.
+     *
+     * @param productName product display name
+     */
     public void setProductName(String productName) {
         this.productName = productName;
     }
 
+    /**
+     * Returns the recommendation text associated with the product.
+     *
+     * @return recommendation text
+     */
     public String getProductText() {
         return productText;
     }
 
+    /**
+     * Sets the recommendation text associated with the product.
+     *
+     * @param productText recommendation text
+     */
     public void setProductText(String productText) {
         this.productText = productText;
     }
 
+    /**
+     * Returns the serialized JSON conditions of this rule.
+     *
+     * @return dynamic-rule conditions as JSON
+     */
     public String getRule() {
         return rule;
     }
 
+    /**
+     * Sets the serialized JSON conditions of this rule.
+     *
+     * @param rule dynamic-rule conditions as JSON
+     */
     public void setRule(String rule) {
         this.rule = rule;
     }
