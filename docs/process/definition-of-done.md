@@ -1,16 +1,16 @@
-# Definition of Done
+# Критерии завершения задачи
 
-A task is complete when all applicable criteria are met:
+Задача считается завершённой, когда выполнены все применимые критерии:
 
-- [ ] Acceptance criteria from the Issue are satisfied.
-- [ ] Code follows the existing project conventions.
-- [ ] No secrets, local database files, or personal data are committed.
-- [ ] Relevant unit/integration tests are added or updated.
-- [ ] Existing fixed recommendation scenarios remain unchanged unless the Issue explicitly changes them.
-- [ ] `mvn clean verify` passes.
-- [ ] Public contracts and configuration changes are documented.
-- [ ] Pull Request describes the change, test evidence, and known limitations.
-- [ ] At least one other team member has reviewed the change.
-- [ ] Integration conflicts and follow-up work are recorded.
+- [ ] Выполнены критерии приёмки из GitHub Issue.
+- [ ] Код соответствует существующим соглашениям проекта.
+- [ ] В репозиторий не добавлены секреты, локальные файлы баз данных или персональные данные.
+- [ ] Необходимые модульные и интеграционные тесты добавлены или обновлены.
+- [ ] Существующие сценарии фиксированных рекомендаций не изменены, если только Issue прямо не предусматривает такие изменения.
+- [ ] Команда `mvn clean verify` завершается успешно.
+- [ ] Изменения публичных контрактов и конфигурации документированы.
+- [ ] В Pull Request описаны изменение, подтверждение тестирования и известные ограничения.
+- [ ] Изменение проверено как минимум одним другим участником команды.
+- [ ] Конфликты интеграции и последующие задачи зафиксированы.
 
-For infrastructure changes, include startup/configuration instructions and verify that the original read-only H2 data source remains unaffected.
+Для инфраструктурных изменений необходимо добавить инструкции по запуску и настройке, а также проверить, что исходный источник данных H2, доступный только для чтения, не затронут.
