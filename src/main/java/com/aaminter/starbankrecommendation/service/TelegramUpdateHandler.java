@@ -102,6 +102,13 @@ public class TelegramUpdateHandler implements UpdatesListener {
         return CONFIRMED_UPDATES_ALL;
     }
 
+    /**
+     * Handles the supported recommendation command after checking the sender's access.
+     *
+     * @param chatId private chat to receive the response
+     * @param senderId Telegram user identifier of the command sender
+     * @param text trimmed message text
+     */
     private void handleMessage(Long chatId, Long senderId, String text) {
         if (!text.startsWith("/recommend ")) {
             return;
@@ -135,6 +142,12 @@ public class TelegramUpdateHandler implements UpdatesListener {
         );
     }
 
+    /**
+     * Sends a text reply to the specified Telegram chat.
+     *
+     * @param chatId destination chat identifier
+     * @param text message body to send
+     */
     private void sendMessage(Long chatId, String text) {
         bot.execute(new SendMessage(chatId, text));
     }
