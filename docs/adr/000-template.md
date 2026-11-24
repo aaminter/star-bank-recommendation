@@ -1,29 +1,29 @@
-# ADR-NNN: Short decision title
+# ADR-NNN: Краткое название решения
 
-- Status: Proposed / Accepted / Superseded
-- Date: YYYY-MM-DD
-- Participants: list contributors who discussed the decision
+- Статус: Предложено / Принято / Заменено последующим решением
+- Дата: ГГГГ-ММ-ДД
+- Участники: перечислите участников, обсуждавших решение
 
-## Context
+## Контекст
 
-What problem or constraint requires a decision?
+Какая проблема или какое ограничение требует принятия решения?
 
-## Options considered
+## Рассмотренные варианты
 
-1. Option A: benefits and drawbacks.
-2. Option B: benefits and drawbacks.
+1. Вариант A: преимущества и недостатки.
+2. Вариант B: преимущества и недостатки.
 
-## Decision
+## Решение
 
-Describe the selected option and why it was selected.
+Опишите выбранный вариант и причины его выбора.
 
-## Consequences
+## Последствия
 
-### Positive
+### Положительные
 - ...
 
-### Negative / trade-offs
+### Отрицательные / компромиссы
 - ...
 
-### Follow-up
-- [ ] Implementation task / test / documentation.
+### Последующие действия
+- [ ] Задача по реализации / тест / документация.

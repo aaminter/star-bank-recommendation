@@ -1,48 +1,48 @@
-# Architecture Overview
+# Обзор архитектуры
 
-## Current architecture
+## Текущая архитектура
 
-Star Bank Recommendation is a Spring Boot backend that returns product recommendations using customer transaction metrics and two groups of recommendation rules:
+Star Bank Recommendation — backend-приложение на Spring Boot, которое формирует рекомендации продуктов на основе метрик транзакций клиента и двух групп правил:
 
-- fixed rule sets implemented in the application;
-- dynamic rule definitions stored in PostgreSQL and evaluated at runtime.
+- фиксированные наборы правил, реализованные в приложении;
+- определения динамических правил, хранящиеся в PostgreSQL и вычисляемые во время выполнения.
 
-The REST API and Telegram bot use the same recommendation service. The application reads customer, product, and transaction data from the supplied H2 database through `JdbcTemplate`. The H2 datasource is read-only.
+REST API и Telegram-бот используют один и тот же сервис рекомендаций. Приложение читает данные о клиентах, продуктах и транзакциях из предоставленной базы H2 через `JdbcTemplate`. Источник данных H2 доступен только для чтения.
 
-## Implemented components and data stores
+## Реализованные компоненты и хранилища данных
 
-- **H2:** source of customer, product, and transaction data. The application reads from it and does not modify it.
-- **PostgreSQL:** stores dynamic rule definitions and rule-hit statistics. The schema is managed by Liquibase; access to dynamic rules uses JPA.
-- **Fixed rule sets:** `Invest500RuleSet`, `TopSavingRuleSet`, and `SimpleCreditRuleSet` remain part of the recommendation flow.
-- **Dynamic rule engine:** evaluates supported conditions, combines conditions with AND semantics, and applies the per-condition `negate` flag.
-- **Caffeine:** caches aggregated customer metrics in the `RecommendationRepository`. The cache is bounded to 10,000 entries and expires entries 10 minutes after write. It does not cache dynamic rule definitions.
-- **Cache management:** `CacheManagementService` invokes all registered `CacheClearable` components. The current cache owner is `RecommendationRepository`.
-- **Telegram integration:** the bot receives updates from Telegram Bot API and sends recommendation responses. Access is restricted by the configured sender-ID allowlist.
-- **Management API:** provides dynamic-rule CRUD, rule statistics, cache invalidation, and application build information.
+- **H2:** источник данных о клиентах, продуктах и транзакциях. Приложение читает эти данные и не изменяет их.
+- **PostgreSQL:** хранит определения динамических правил и статистику их срабатываний. Схема управляется Liquibase; для доступа к динамическим правилам используется JPA.
+- **Фиксированные наборы правил:** `Invest500RuleSet`, `TopSavingRuleSet` и `SimpleCreditRuleSet` остаются частью процесса формирования рекомендаций.
+- **Механизм динамических правил:** вычисляет поддерживаемые условия, объединяет их по логике AND и применяет флаг `negate` для каждого отдельного условия.
+- **Caffeine:** кеширует агрегированные метрики клиента в `RecommendationRepository`. Размер кеша ограничен 10 000 записями, срок хранения записи составляет 10 минут после добавления. Определения динамических правил в кеше не хранятся.
+- **Управление кешем:** `CacheManagementService` вызывает все зарегистрированные компоненты, реализующие `CacheClearable`. В текущей реализации владельцем кеша является `RecommendationRepository`.
+- **Интеграция с Telegram:** бот получает обновления от Telegram Bot API и отправляет ответы с рекомендациями. Доступ ограничен списком разрешённых ID отправителей.
+- **Служебный API:** предоставляет CRUD для динамических правил, статистику срабатываний правил, инвалидацию кеша и сведения о сборке приложения.
 
-## Recommendation request flow
+## Последовательность обработки запроса рекомендаций
 
-1. A request arrives through the recommendation REST endpoint or Telegram handler.
-2. `RecommendationService` obtains customer metrics from `RecommendationRepository`.
-3. The repository returns cached metrics when available; otherwise it aggregates the source data from read-only H2 and stores the result in Caffeine.
-4. The service evaluates the fixed rule sets.
-5. The service loads dynamic rule definitions from PostgreSQL and evaluates their conditions using AND semantics and each condition's `negate` flag.
-6. Matching recommendations are returned. For a matching dynamic rule, the rule-hit statistic is incremented.
+1. Запрос поступает через REST endpoint рекомендаций или обработчик Telegram.
+2. `RecommendationService` получает метрики клиента из `RecommendationRepository`.
+3. Репозиторий возвращает кешированные метрики, если они доступны; в противном случае агрегирует исходные данные из H2, доступной только для чтения, и сохраняет результат в Caffeine.
+4. Сервис проверяет фиксированные наборы правил.
+5. Сервис загружает определения динамических правил из PostgreSQL и проверяет их условия по логике AND с учётом флага `negate` каждого условия.
+6. Совпавшие рекомендации возвращаются вызывающей стороне. Для совпавшего динамического правила увеличивается статистика его срабатываний.
 
-## Invariants
+## Инварианты
 
-1. The supplied H2 database is a read-only source and must not be modified.
-2. All fixed recommendation rule sets must remain operational.
-3. Dynamic rule definitions and their statistics are stored in PostgreSQL.
-4. Dynamic rules are validated before persistence and evaluated using the documented condition semantics.
-5. Customer metrics are cached in-process by customer ID; cache entries expire after 10 minutes and the cache is limited to 10,000 entries.
-6. The management cache-clear endpoint invalidates caches registered through `CacheClearable`.
-7. Telegram access is restricted to sender IDs in `TELEGRAM_BOT_ALLOWED_USER_IDS`.
+1. Предоставленная база H2 является источником данных только для чтения и не должна изменяться.
+2. Все фиксированные наборы правил рекомендаций должны продолжать работать.
+3. Определения динамических правил и статистика их срабатываний хранятся в PostgreSQL.
+4. Динамические правила проверяются до сохранения и вычисляются в соответствии с документированной семантикой условий.
+5. Метрики клиента кешируются внутри процесса по ID клиента; срок хранения записей составляет 10 минут, размер кеша ограничен 10 000 записями.
+6. Endpoint очистки кеша удаляет записи всех кешей, зарегистрированных через `CacheClearable`.
+7. Доступ Telegram ограничен ID отправителей, перечисленными в `TELEGRAM_BOT_ALLOWED_USER_IDS`.
 
-## Related architecture decisions
+## Связанные архитектурные решения
 
-- [ADR-001: Read-only source and dynamic rule storage](../adr/001-read-only-source-and-dynamic-rule-storage.md)
-- [ADR-002: Dynamic rule condition semantics](../adr/002-dynamic-rule-condition-semantics.md)
-- [ADR-003: Local cache and invalidation](../adr/003-local-cache-and-invalidation.md)
+- [ADR-001: Исходные данные только для чтения и отдельное хранение динамических правил](../adr/001-read-only-source-and-dynamic-rule-storage.md)
+- [ADR-002: Семантика условий динамических правил](../adr/002-dynamic-rule-condition-semantics.md)
+- [ADR-003: Локальное кеширование и инвалидация](../adr/003-local-cache-and-invalidation.md)
 
-For the component and activity diagrams, see [Architecture](../architecture.md).
+Диаграммы компонентов и процесса формирования рекомендаций приведены в документе [«Архитектура»](../architecture.md).

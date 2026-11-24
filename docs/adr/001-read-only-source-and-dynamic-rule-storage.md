@@ -1,53 +1,53 @@
-# ADR-001: Keep source transactions read-only and store dynamic rules separately
+# ADR-001: Сохранение исходных транзакций в режиме «только чтение» и отдельное хранение динамических правил
 
-- Status: Accepted
-- Date: 2026-10-31
-- Participants: `aaminter`, `tani9kuz-lang`; agreement recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
+- Статус: Принято
+- Дата: 2026-10-31
+- Участники: `aaminter`, `tani9kuz-lang`; согласование зафиксировано в [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
 
-## Context
+## Контекст
 
-The service reads existing customer transaction and product data from the supplied H2 database. The project is adding dynamic recommendation rules that require persistence and CRUD operations.
+Сервис читает существующие данные о транзакциях клиентов и банковских продуктах из предоставленной базы H2. В проект добавляются динамические правила рекомендаций, для которых требуются постоянное хранение и операции CRUD.
 
-Writing dynamic configuration into the supplied H2 database would mix operational source data with application-managed configuration and would violate the read-only boundary already established in the project configuration.
+Запись динамической конфигурации в предоставленную базу H2 смешала бы исходные операционные данные с конфигурацией, управляемой приложением, и нарушила бы установленное в проекте ограничение на доступ к источнику только для чтения.
 
-## Options considered
+## Рассмотренные варианты
 
-1. Store dynamic rules in the existing H2 database.
-   - Benefit: fewer infrastructure components.
-   - Drawback: violates the read-only source boundary and couples new configuration to the supplied data store.
-2. Store dynamic rules in a separate PostgreSQL database.
-   - Benefit: isolates application-managed configuration and allows independent schema migrations.
-   - Drawback: adds a datasource, credentials, migrations, and operational setup.
+1. Хранить динамические правила в существующей базе H2.
+   - Преимущество: меньше инфраструктурных компонентов.
+   - Недостаток: нарушается режим доступа к исходной базе только для чтения, а новая конфигурация связывается с предоставленным хранилищем данных.
+2. Хранить динамические правила в отдельной базе PostgreSQL.
+   - Преимущество: конфигурация приложения изолирована от исходных данных; миграции схемы можно выполнять независимо.
+   - Недостаток: добавляются источник данных, учётные данные, миграции и дополнительные настройки окружения.
 
-## Accepted decision
+## Принятое решение
 
-Keep the supplied H2 datasource read-only and use a separate PostgreSQL datasource for dynamic rule definitions and rule statistics. Existing fixed rules and H2-backed transaction/product reads remain unchanged.
+Сохранить предоставленный источник H2 в режиме «только чтение», а для определений динамических правил и статистики их срабатываний использовать отдельный источник данных PostgreSQL. Существующие фиксированные правила и чтение транзакций и продуктов из H2 остаются без изменений.
 
-The application configures the H2 connection with `spring.datasource.hikari.read-only=true` and a file JDBC URL containing `ACCESS_MODE_DATA=r;IFEXISTS=TRUE`. Dynamic-rule JPA repositories use the dedicated `recommendationsDataSource`, `recommendationsEntityManagerFactory`, and `recommendationsTransactionManager`. Liquibase is configured against the PostgreSQL datasource.
+Подключение H2 настраивается с параметром `spring.datasource.hikari.read-only=true` и файловым JDBC URL, содержащим `ACCESS_MODE_DATA=r;IFEXISTS=TRUE`. Репозитории JPA для динамических правил используют выделенные `recommendationsDataSource`, `recommendationsEntityManagerFactory` и `recommendationsTransactionManager`. Liquibase настроен на работу с источником данных PostgreSQL.
 
-## Current implementation and verification
+## Текущая реализация и проверка
 
-- `application.properties` configures the source H2 datasource as read-only and points it to an existing database file; the default URL does not create a missing source database.
-- `DataSourceConfig` creates a separate datasource from `custom.datasource.recommendations` properties.
-- `RecommendationsJpaConfig` binds the dynamic-rule repositories and their transaction manager to that PostgreSQL datasource.
-- Liquibase uses the PostgreSQL JDBC URL and credentials.
-- `DynamicRuleIntegrationTest` exercises rule creation, retrieval, deletion, and statistics through the application and checks the PostgreSQL repository state.
-- The integration test overrides `spring.datasource.hikari.read-only=false` and creates/populates H2 tables as test fixtures. It therefore does not prove that writes through the application-bound H2 datasource are rejected.
-- `SourceDataSourceReadOnlyTest` separately verifies the write-protection mechanism: it prepares a temporary H2 database, reconnects using `ACCESS_MODE_DATA=r;IFEXISTS=TRUE` and a Hikari datasource with `readOnly=true`, attempts an `INSERT`, expects a `DataAccessException`, and verifies that no row was written. This test verifies the read-only JDBC URL and Hikari setting together; it does not load the application's Spring datasource properties or prove their binding.
+- В `application.properties` исходный источник H2 настроен только для чтения и указывает на существующий файл базы данных; URL по умолчанию не создаёт отсутствующую исходную базу.
+- `DataSourceConfig` создаёт отдельный источник данных на основании свойств `custom.datasource.recommendations`.
+- `RecommendationsJpaConfig` связывает репозитории динамических правил и их менеджер транзакций с этим источником PostgreSQL.
+- Liquibase использует JDBC URL и учётные данные PostgreSQL.
+- `DynamicRuleIntegrationTest` проверяет создание, получение и удаление правил, а также статистику через приложение и состояние репозитория PostgreSQL.
+- В интеграционном тесте переопределяется `spring.datasource.hikari.read-only=false`, а таблицы H2 создаются и заполняются как тестовые данные. Поэтому этот тест сам по себе не доказывает, что запись через привязанный к приложению источник H2 отклоняется.
+- Отдельный тест `SourceDataSourceReadOnlyTest` проверяет механизм защиты от записи: он подготавливает временную базу H2, повторно подключается с `ACCESS_MODE_DATA=r;IFEXISTS=TRUE` и источником Hikari с `readOnly=true`, выполняет попытку `INSERT`, ожидает `DataAccessException` и проверяет, что строка не была записана. Тест проверяет совместное действие read-only JDBC URL и настройки Hikari; он не загружает свойства Spring-источника данных приложения и не доказывает корректность их привязки.
 
-## Consequences
+## Последствия
 
-### Positive
-- Protects the original transaction/product dataset.
-- Separates source data from application-managed rule configuration.
-- Allows independent Liquibase migrations for dynamic rules.
+### Положительные
+- Защита исходного набора транзакций и продуктов.
+- Разделение исходных данных и конфигурации, управляемой приложением.
+- Возможность выполнять независимые миграции Liquibase для динамических правил.
 
-### Trade-offs
-- The application must configure and test two data sources.
-- Local development and CI need reproducible PostgreSQL setup.
-- Integration tests must prove that dynamic CRUD does not write to H2.
+### Компромиссы
+- Приложению необходимо настраивать и тестировать два источника данных.
+- Для локальной разработки и CI требуется воспроизводимая настройка PostgreSQL.
+- Интеграционные тесты должны подтверждать, что операции CRUD с динамическими правилами не записывают данные в H2.
 
-### Follow-up
-- [x] Document datasource properties and ownership in `application.properties` and `docs/deployment.md`.
-- [x] Add integration coverage for PostgreSQL CRUD and rule statistics.
-- [x] Add a dedicated negative test verifying that H2 rejects writes when connected with the read-only JDBC URL and Hikari `readOnly=true`; the test is isolated from Spring property binding.
+### Последующие действия
+- [x] Документировать свойства источников данных и их назначение в `application.properties` и `docs/deployment.md`.
+- [x] Добавить интеграционные проверки CRUD для PostgreSQL и статистики срабатываний правил.
+- [x] Добавить отдельный негативный тест, подтверждающий, что H2 отклоняет запись при подключении с read-only JDBC URL и `readOnly=true` в Hikari; тест изолирован от привязки свойств Spring.

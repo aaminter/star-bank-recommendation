@@ -1,31 +1,31 @@
-# Team Development Workflow
+# Порядок командной разработки
 
-## Task lifecycle
+## Жизненный цикл задачи
 
-1. Describe the outcome and acceptance criteria in a GitHub Issue.
-2. Identify dependencies and agree on contracts before parallel implementation.
-3. Assign an owner and create a feature branch.
-4. Implement the smallest coherent change.
-5. Run relevant tests and `mvn clean verify`.
-6. Open a Pull Request referencing the Issue.
-7. Request review and resolve blocking comments.
-8. Merge only after checks pass and integration impact is understood.
-9. Update the Issue and record follow-up work.
+1. Опишите ожидаемый результат и критерии приёмки в GitHub Issue.
+2. Определите зависимости и согласуйте контракты до начала параллельной реализации.
+3. Назначьте ответственного и создайте отдельную ветвь для задачи.
+4. Реализуйте минимальное, но целостное изменение.
+5. Запустите необходимые тесты и команду `mvn clean verify`.
+6. Откройте Pull Request со ссылкой на Issue.
+7. Запросите проверку и устраните блокирующие замечания.
+8. Выполняйте слияние только после успешных проверок и оценки влияния на интеграцию.
+9. Обновите Issue и зафиксируйте последующие задачи.
 
-## Branch conventions
+## Соглашения об именовании ветвей
 
-Use descriptive names such as:
+Используйте понятные названия, например:
 
-- `feature/<short-purpose>`
-- `fix/<short-purpose>`
-- `docs/<short-purpose>`
+- `feature/<краткое-назначение>`
+- `fix/<краткое-назначение>`
+- `docs/<краткое-назначение>`
 
-Avoid committing directly to the integration branch for feature work.
+Не добавляйте изменения функциональности напрямую в интеграционную ветвь.
 
-## Coordination
+## Координация
 
-The coordinator maintains visibility of dependencies, integration sequence, and risks. Each task owner remains responsible for implementation quality, tests, and communicating blockers. Technical contracts are agreed by the contributors affected by them, not imposed silently.
+Координатор обеспечивает видимость зависимостей, последовательности интеграции и рисков. Ответственный за каждую задачу отвечает за качество реализации, тесты и своевременное сообщение о блокирующих обстоятельствах. Технические контракты согласуются участниками, которых они затрагивают, а не вводятся без обсуждения.
 
-## Evidence
+## Подтверждение выполнения
 
-Use Issues, PR descriptions, review threads, commit history, and test results as the project record. Do not claim completion based only on a verbal status update.
+Используйте Issues, описания PR, обсуждения проверки кода, историю коммитов и результаты тестов как проектные свидетельства. Не объявляйте задачу завершённой только на основании устного сообщения о статусе.

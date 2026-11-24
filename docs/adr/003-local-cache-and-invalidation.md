@@ -1,63 +1,63 @@
-# ADR-003: Local caching and invalidation strategy
+# ADR-003: Стратегия локального кеширования и инвалидации
 
-- Status: Accepted; implementation deviation documented
-- Date: 2026-10-31
-- Participants: `aaminter`, `tani9kuz-lang`; agreement recorded in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
+- Статус: Принято; отклонение реализации от первоначального предложения документировано
+- Дата: 2026-10-31
+- Участники: `aaminter`, `tani9kuz-lang`; согласование зафиксировано в [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
 
-## Context
+## Контекст
 
-The recommendation flow repeatedly reads customer transaction and product data from the read-only H2 source. Caching can reduce repeated database aggregation, but cached values must be bounded and have an explicit invalidation mechanism.
+В процессе формирования рекомендаций повторно читаются данные о транзакциях и продуктах клиента из исходной базы H2, доступной только для чтения. Кеширование может сократить количество повторных агрегирующих запросов, однако кешированные значения должны иметь ограниченный срок хранения и явно определённый механизм инвалидации.
 
-Dynamic rule definitions are stored separately in PostgreSQL. Caching those definitions would require invalidation when the rule set changes.
+Определения динамических правил хранятся отдельно в PostgreSQL. Кеширование этих определений потребовало бы инвалидации при каждом изменении набора правил.
 
-## Options considered
+## Рассмотренные варианты
 
-1. No cache.
-   - Benefit: simplest correctness model and always-current reads.
-   - Drawback: repeated aggregation queries against H2.
-2. Local in-memory cache with Caffeine.
-   - Benefit: lightweight integration and low latency for a single application instance.
-   - Drawback: process-local state requires an explicit expiry and invalidation policy.
-3. Distributed cache.
-   - Benefit: shared state across application instances.
-   - Drawback: adds infrastructure and operational complexity not justified by the current project scale.
+1. Не использовать кеш.
+   - Преимущество: простая модель корректности и чтение актуальных данных при каждом запросе.
+   - Недостаток: повторяющиеся агрегирующие запросы к H2.
+2. Использовать локальный кеш в памяти на базе Caffeine.
+   - Преимущество: простая интеграция и низкая задержка для одного экземпляра приложения.
+   - Недостаток: состояние внутри процесса требует явной политики срока хранения и инвалидации.
+3. Использовать распределённый кеш.
+   - Преимущество: общее состояние для нескольких экземпляров приложения.
+   - Недостаток: дополнительная инфраструктура и операционная сложность, не оправданные текущим масштабом проекта.
 
-## Accepted decision
+## Принятое решение
 
-Use Caffeine for local in-process caching. Keep the cache bounded and provide an application-level cache invalidation mechanism. Do not introduce distributed caching without a measured need.
+Использовать Caffeine для локального кеширования внутри процесса. Ограничить размер кеша и предоставить механизм инвалидации на уровне приложения. Не внедрять распределённое кеширование без подтверждённой измерениями необходимости.
 
-Dynamic rule definitions stored in PostgreSQL are intentionally not cached. The original discussion considered caching them, but the current read path loads the rule set from PostgreSQL directly. No measured performance need currently justifies a second cache and its mutation-invalidation requirements. This supersedes the earlier proposal to cache dynamic rule definitions. If profiling later identifies PostgreSQL rule reads as a bottleneck, caching can be reconsidered with explicit invalidation on every successful rule mutation.
+Определения динамических правил, хранящиеся в PostgreSQL, намеренно не кешируются. В первоначальном обсуждении рассматривалось их кеширование, однако текущий путь чтения загружает набор правил непосредственно из PostgreSQL. На данный момент нет измеренной потребности в дополнительном кеше и механизме его инвалидации при изменениях. Это решение заменяет более раннее предложение кешировать определения динамических правил. Если профилирование в дальнейшем выявит, что чтение правил из PostgreSQL стало узким местом, кеширование можно пересмотреть, предусмотрев явную инвалидацию после каждой успешной операции изменения правила.
 
-## Current implementation
+## Текущая реализация
 
-The implemented cache is owned by `RecommendationRepository` and stores aggregated `CustomerMetrics`, keyed by customer UUID:
+Реализованный кеш принадлежит `RecommendationRepository` и хранит агрегированные `CustomerMetrics`, индексированные UUID клиента:
 
-- maximum size: 10,000 entries;
-- expiry: 10 minutes after write;
-- cache miss: metrics are loaded from the read-only H2 database through `JdbcTemplate`;
-- cache clear: `RecommendationRepository` implements `CacheClearable`, and `CacheManagementService` invokes all registered cache owners through `POST /management/clear-caches`.
+- максимальный размер: 10 000 записей;
+- срок хранения: 10 минут после записи;
+- промах кеша: метрики загружаются из базы H2, доступной только для чтения, через `JdbcTemplate`;
+- очистка кеша: `RecommendationRepository` реализует `CacheClearable`, а `CacheManagementService` вызывает все зарегистрированные компоненты-владельцы кеша через `POST /management/clear-caches`.
 
-`DynamicRuleService` reads dynamic rule definitions from PostgreSQL through `DynamicRuleRepository`; it does not currently maintain a Caffeine cache. Therefore, create/delete operations do not invalidate a dynamic-rule cache in the current implementation.
+`DynamicRuleService` читает определения динамических правил из PostgreSQL через `DynamicRuleRepository`; собственного кеша Caffeine он сейчас не использует. Поэтому операции создания и удаления не требуют инвалидации кеша динамических правил в текущей реализации.
 
-## Consequences
+## Последствия
 
-### Positive
+### Положительные
 
-- Repeated customer-metrics aggregation can be avoided while a cache entry is valid.
-- Cache memory use is bounded.
-- The management endpoint provides a common invalidation mechanism for registered cache owners.
-- No separate cache infrastructure is required.
+- Повторные агрегирующие запросы метрик клиента можно не выполнять, пока запись кеша действительна.
+- Использование памяти кешем ограничено.
+- Служебный endpoint предоставляет единый механизм инвалидации для зарегистрированных владельцев кеша.
+- Не требуется отдельная инфраструктура кеширования.
 
-### Trade-offs and limitations
+### Компромиссы и ограничения
 
-- Each application instance has its own cache.
-- Cached customer metrics can remain stale for up to the configured expiry period unless the management endpoint is called.
-- Dynamic rule definitions are not cached, so each recommendation flow loads them from PostgreSQL.
-- Dynamic rule definitions are deliberately read from PostgreSQL on each retrieval; this avoids stale rule definitions and mutation-driven cache invalidation, at the cost of a database read.
+- У каждого экземпляра приложения собственный кеш.
+- Кешированные метрики клиента могут оставаться устаревшими до истечения заданного срока хранения, если не вызвать служебный endpoint.
+- Определения динамических правил не кешируются, поэтому при каждом процессе формирования рекомендаций они загружаются из PostgreSQL.
+- Определения динамических правил намеренно читаются из PostgreSQL при каждом обращении. Это исключает устаревание правил и необходимость инвалидации кеша при их изменении, но требует чтения из базы данных.
 
-## Follow-up
+## Последующие действия
 
-- [x] Decide whether dynamic rule definitions should be cached. They are intentionally not cached unless profiling demonstrates a material performance need; this supersedes the earlier proposal to cache them.
-- [x] Add tests proving customer-metrics cache reuse, expiry, and invalidation through the management HTTP endpoint.
-- [x] Document the operational procedure for invoking cache invalidation after source-data changes in [deployment instructions](../deployment.md#управление-кешем).
-- [ ] Revisit the local-cache decision if the application is deployed with multiple instances. The cache is process-local, so each instance must be invalidated independently; distributed caching remains out of scope until there is a demonstrated need.
+- [x] Принять решение о необходимости кеширования определений динамических правил. Они намеренно не кешируются, пока профилирование не докажет существенную потребность; это заменяет первоначальное предложение их кешировать.
+- [x] Добавить тесты повторного использования кеша метрик клиента, истечения срока хранения и инвалидации через HTTP endpoint управления.
+- [x] Документировать операционный порядок вызова инвалидации кеша после изменения исходных данных в [инструкции по развёртыванию](../deployment.md#управление-кешем).
+- [ ] Пересмотреть решение о локальном кеше, если приложение будет развёрнуто в нескольких экземплярах. Кеш хранится внутри процесса, поэтому каждый экземпляр необходимо инвалидировать отдельно; распределённое кеширование остаётся за рамками проекта до появления подтверждённой потребности.

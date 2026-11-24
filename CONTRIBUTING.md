@@ -1,40 +1,40 @@
-# Contributing
+# Как внести вклад в проект
 
-## Before starting
+## Перед началом работы
 
-1. Select an open GitHub Issue or create one with an outcome and acceptance criteria.
-2. Check dependencies and agree on API/data contracts with affected contributors.
-3. Confirm the task owner and integration sequence.
-4. Do not start parallel work on the same files without coordination.
+1. Выберите открытую задачу GitHub Issue или создайте новую, указав ожидаемый результат и критерии приёмки.
+2. Проверьте зависимости и согласуйте контракты API и данных с участниками, которых затрагивает задача.
+3. Подтвердите ответственного за задачу и последовательность интеграции.
+4. Не начинайте параллельную работу над одними и теми же файлами без предварительной координации.
 
-## Branches and commits
+## Ветви и коммиты
 
-Use descriptive branches:
+Используйте понятные названия ветвей:
 
-- `feature/<purpose>`
-- `fix/<purpose>`
-- `docs/<purpose>`
+- `feature/<назначение>`
+- `fix/<назначение>`
+- `docs/<назначение>`
 
-Keep commits focused. Commit messages should describe the change, not the activity.
+Делайте коммиты небольшими и тематически цельными. Сообщение коммита должно описывать изменение, а не действие по его выполнению.
 
-## Implementation rules
+## Правила реализации
 
-- Preserve the supplied H2 database as read-only.
-- Keep dynamic rule storage separate from source transaction data.
-- Preserve existing fixed recommendation behavior.
-- Never commit credentials, database files, tokens, or personal data.
-- Validate external input at the API boundary.
-- Add tests for normal, negative, boundary, and invalid-input cases.
+- Сохраняйте предоставленную базу H2 в режиме «только чтение».
+- Храните динамические правила отдельно от исходных данных транзакций.
+- Сохраняйте существующее поведение фиксированных рекомендаций.
+- Не добавляйте в репозиторий учётные данные, файлы баз данных, токены или персональные данные.
+- Проверяйте внешние входные данные на границе API.
+- Добавляйте тесты для штатных, отрицательных, граничных сценариев и некорректных входных данных.
 
-## Pull Requests
+## Pull Request
 
-- Link the GitHub Issue.
-- Describe the design and externally visible behavior.
-- List tests and their results.
-- Call out configuration, migration, and compatibility changes.
-- Request review from a contributor familiar with the affected module.
-- Resolve blocking review comments before merge.
+- Добавьте ссылку на GitHub Issue.
+- Опишите проектное решение и поведение, заметное внешним потребителям.
+- Перечислите тесты и их результаты.
+- Отметьте изменения конфигурации, миграции и совместимости.
+- Запросите проверку у участника, знакомого с затронутым модулем.
+- Устраните блокирующие замечания проверки до слияния.
 
-## Definition of Done
+## Критерии завершения
 
-Use [Definition of Done](docs/process/definition-of-done.md). A task is not complete merely because the code is pushed: required checks, review, and integration evidence must be available.
+Используйте документ [Критерии завершения](docs/process/definition-of-done.md). Задача не считается завершённой только потому, что код отправлен в репозиторий: должны быть доступны результаты обязательных проверок, review и подтверждение интеграции.
