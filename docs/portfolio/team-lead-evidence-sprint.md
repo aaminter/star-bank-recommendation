@@ -1,145 +1,145 @@
-# Team Lead Evidence Sprint: 4 Weeks
+# Четырёхнедельный цикл подтверждения навыков Team Lead
 
-**Project:** Star Bank Recommendation  
-**Purpose:** produce verifiable evidence of technical leadership through a real collaborative delivery cycle.  
-**Participants:** project coordinator/reviewer and contributor `tani9kuz-lang`.  
-**Status:** completed on 2026-11-23; evidence and measured outcomes are summarized below.
+**Проект:** Star Bank Recommendation  
+**Цель:** получить проверяемые свидетельства технического лидерства в рамках реального совместного цикла разработки и поставки изменений.  
+**Участники:** координатор проекта / проверяющий и участник `tani9kuz-lang`.  
+**Статус:** завершён 2026-11-23; свидетельства и измеренные результаты приведены ниже.
 
-## Definition of 5/5
+## Критерии максимальной оценки 5/5
 
-The sprint is successful only when the contributor independently delivers an agreed module through a Pull Request, the reviewer performs a substantive review, defects are corrected, architecture and integration decisions are documented, the change is merged after CI passes, and the team completes a retrospective using repository evidence.
+Цикл считается успешным только тогда, когда участник самостоятельно поставляет согласованный модуль через Pull Request, проверяющий проводит содержательную проверку, дефекты исправляются, архитектурные и интеграционные решения документируются, изменение объединяется после успешного CI, а команда проводит ретроспективу на основе свидетельств из репозитория.
 
-A task assignment, draft ADR, README statement, or self-merged PR does not count as proof.
+Постановка задачи, черновик ADR, запись в README или PR, объединённый самим автором без независимой проверки, не считаются доказательством.
 
-## Week 1: Align and prepare
+## Неделя 1. Согласование и подготовка
 
-**Contributor**
-- Confirm the module boundary and acceptance criteria.
-- Review the existing code and tests.
-- Create a feature branch and implement the agreed contract.
-- Open a draft PR early, with a short implementation plan and known risks.
+**Участник**
+- Подтверждает границы модуля и критерии приёмки.
+- Изучает существующий код и тесты.
+- Создаёт feature-ветвь и реализует согласованный контракт.
+- Открывает черновой PR на раннем этапе, добавляя краткий план реализации и известные риски.
 
-**Coordinator / reviewer**
-- Agree the API and persistence contracts before implementation.
-- Review the task breakdown and identify dependencies.
-- Discuss ADR proposals with the contributor; record decisions only after agreement.
-- Avoid implementing the contributor's module on their behalf.
+**Координатор / проверяющий**
+- Согласует контракты API и хранения данных до начала реализации.
+- Проверяет декомпозицию задачи и выявляет зависимости.
+- Обсуждает предложения ADR с участником; фиксирует решения только после согласования.
+- Не реализует модуль участника вместо него.
 
-**Evidence**
-- Confirmed Issue and acceptance checklist.
-- ADR decision record with participants, alternatives, decision and consequences.
-- Draft PR linked to the Issue.
+**Свидетельства**
+- Подтверждённая Issue и контрольный список критериев приёмки.
+- Запись архитектурного решения с участниками, альтернативами, решением и последствиями.
+- Черновой PR со ссылкой на Issue.
 
-## Week 2: Independent implementation and first review
+## Неделя 2. Самостоятельная реализация и первая проверка
 
-**Contributor**
-- Complete the module implementation and focused tests.
-- Update the PR description and provide test evidence.
-- Respond to each review comment with a code change or reasoned discussion.
+**Участник**
+- Завершает реализацию модуля и тематические тесты.
+- Обновляет описание PR и предоставляет результаты тестирования.
+- Отвечает на каждое замечание проверки изменением кода или аргументированным обсуждением.
 
-**Coordinator / reviewer**
-- Review correctness, boundaries, validation, error handling, test quality and maintainability.
-- Leave actionable inline comments tied to code.
-- Separate blocking defects from suggestions.
-- Do not approve while blocking comments remain unresolved.
+**Координатор / проверяющий**
+- Проверяет корректность, границы ответственности, валидацию, обработку ошибок, качество тестов и сопровождаемость.
+- Оставляет конкретные замечания непосредственно к соответствующим строкам кода.
+- Разделяет блокирующие дефекты и предложения.
+- Не одобряет PR, пока блокирующие замечания не устранены.
 
-**Evidence**
-- PR authored by the contributor.
-- Review with inline comments.
-- Follow-up commits by the contributor addressing review feedback.
-- Resolved review threads.
+**Свидетельства**
+- PR, созданный участником.
+- Проверка с комментариями непосредственно к коду.
+- Последующие коммиты участника, устраняющие замечания.
+- Обсуждения проверки, отмеченные как решённые.
 
-## Week 3: Integration and regression control
+## Неделя 3. Интеграция и регрессионный контроль
 
-**Contributor**
-- Rebase or merge the current integration branch as agreed.
-- Resolve module-level conflicts and update tests.
-- Demonstrate the module through its public contract.
+**Участник**
+- Обновляет свою ветвь относительно текущей интеграционной ветви согласованным способом.
+- Устраняет конфликты на уровне модуля и обновляет тесты.
+- Демонстрирует работу модуля через его публичный контракт.
 
-**Coordinator / reviewer**
-- Coordinate integration with the existing recommendation engine.
-- Resolve cross-module conflicts without taking ownership away from the contributor.
-- Verify fixed recommendation rules remain unchanged.
-- Check read-only access to the H2 source.
-- Ensure one metrics snapshot is reused per request instead of repeating the same aggregate query in each rule.
-- Require PostgreSQL/Liquibase integration tests for the dynamic-rule storage path before treating that capability as delivered.
+**Координатор / проверяющий**
+- Координирует интеграцию с существующим механизмом рекомендаций.
+- Разрешает межмодульные конфликты, не забирая ответственность за реализацию у участника.
+- Проверяет, что фиксированные правила рекомендаций остались без изменений.
+- Проверяет доступ к исходной базе H2 только для чтения.
+- Проверяет, что в рамках одного запроса используется единый снимок метрик, а не повторно выполняется один и тот же агрегирующий запрос для каждого правила.
+- Требует интеграционные тесты PostgreSQL/Liquibase для пути хранения динамических правил до признания этой возможности реализованной.
 
-**Evidence**
-- Integration PR and commit history.
-- CI run URL and green test result.
-- Regression tests for fixed rules and read-only source behavior.
-- Documented integration decisions.
+**Свидетельства**
+- Интеграционный PR и история коммитов.
+- Ссылка на запуск CI и успешный результат тестирования.
+- Регрессионные тесты фиксированных правил и поведения источника только для чтения.
+- Документированные интеграционные решения.
 
-## Week 4: Delivery, review and retrospective
+## Неделя 4. Поставка, проверка и ретроспектива
 
-**Contributor**
-- Complete agreed fixes and documentation.
-- Confirm the final behavior against acceptance criteria.
-- Present the delivered module and remaining limitations.
+**Участник**
+- Завершает согласованные исправления и документацию.
+- Подтверждает итоговое поведение по критериям приёмки.
+- Представляет реализованный модуль и оставшиеся ограничения.
 
-**Coordinator / reviewer**
-- Perform final review and approve only after blockers are resolved.
-- Confirm merge after required checks pass.
-- Facilitate a blameless retrospective based on Issues, PR timestamps, review iterations, CI and defects.
+**Координатор / проверяющий**
+- Выполняет итоговую проверку и одобряет изменение только после устранения блокирующих замечаний.
+- Подтверждает слияние после прохождения обязательных проверок.
+- Проводит ретроспективу без поиска виноватых на основе Issues, временных отметок PR, итераций проверки, CI и дефектов.
 
-**Evidence**
-- Merged contributor-authored PR.
-- Green CI run on the target branch.
-- Accepted ADRs.
-- Completed retrospective with 3–5 actions, owners and verification dates.
-- Updated case study containing links to evidence, not unsupported claims.
+**Свидетельства**
+- Объединённый PR, созданный участником.
+- Успешный запуск CI в целевой ветви.
+- Принятые ADR.
+- Завершённая ретроспектива с 3–5 действиями, ответственными и датами проверки.
+- Обновлённое описание проекта с ссылками на свидетельства, а не неподтверждёнными утверждениями.
 
-## Scorecard
+## Оценочная таблица
 
-| Criterion | 0 | 1 |
+| Критерий | 0 | 1 |
 |---|---|---|
-| Contributor ownership | No independent delivery | Contributor delivers agreed module |
-| Code review | No substantive review | Review comments and fixes are visible |
-| Architecture | Decisions remain informal/proposed | ADRs discussed and accepted by team |
-| Integration | No integrated delivery | Integration completed and regression-tested |
-| Quality and learning | No verified CI or retrospective | Green CI, tests and measured retrospective |
+| Ответственность участника | Нет самостоятельной поставки | Участник поставляет согласованный модуль |
+| Проверка кода | Нет содержательной проверки | Видны замечания проверки и исправления |
+| Архитектура | Решения остаются неформальными или предложенными | ADR обсуждены и приняты командой |
+| Интеграция | Нет интегрированной поставки | Интеграция завершена и проверена регрессионными тестами |
+| Качество и обучение | Нет подтверждённого CI или ретроспективы | Успешный CI, тесты и измеримая ретроспектива |
 
-**5/5 requires all five criteria to score 1.** Partial completion must be reported as a partial score.
+**Оценка 5/5 возможна только при получении 1 балла по всем пяти критериям.** Частичное выполнение должно отражаться как частичная оценка.
 
-## Metrics to capture
+## Метрики для сбора
 
-- Lead time: Issue start to merged PR.
-- Review latency: PR ready-for-review to first substantive review.
-- Review iterations: number of review/fix cycles.
-- CI: first-run result and final result.
-- Defects: blocking issues found in review and after merge.
-- Scope: acceptance criteria completed / agreed.
-- Ownership: contributor-authored commits and reviewer-authored review comments.
+- Время выполнения задачи: от начала Issue до объединения PR.
+- Задержка проверки: от готовности PR к проверке до первого содержательного отзыва.
+- Число итераций проверки: количество циклов «проверка / исправление».
+- CI: результат первого запуска и итоговый результат.
+- Дефекты: блокирующие проблемы, найденные при проверке и после слияния.
+- Объём: выполненные критерии приёмки / согласованный объём.
+- Ответственность: коммиты автора и комментарии проверяющего.
 
-Do not set arbitrary targets before the first baseline is measured. Record actual values and compare them with the next cycle.
+Не устанавливайте произвольные целевые значения до измерения исходного уровня. Зафиксируйте фактические значения и сравните их со следующим циклом.
 
-## Risks and controls
+## Риски и меры контроля
 
-- **Overtaking the contributor's work:** reviewer coaches and reviews; contributor owns implementation.
-- **Late contract changes:** agree interfaces in Week 1 and record changes in ADR/PR.
-- **Green CI without meaningful tests:** inspect test assertions and coverage of failure paths.
-- **False leadership claims:** count only merged work and visible review/integration evidence.
-- **Insufficient scope:** reduce module scope rather than simulate completion.
+- **Проверяющий забирает работу участника:** проверяющий консультирует и оценивает, участник сохраняет ответственность за реализацию.
+- **Позднее изменение контракта:** согласовать интерфейсы на первой неделе и фиксировать изменения в ADR/PR.
+- **Успешный CI без содержательных тестов:** проверять утверждения тестов и покрытие сценариев отказа.
+- **Недостоверные заявления о лидерстве:** учитывать только объединённую работу и видимые свидетельства проверки и интеграции.
+- **Недостаточный объём задачи:** уменьшить объём модуля вместо имитации завершения.
 
-## Final assessment
+## Итоговая оценка
 
-The completed repository evidence supports a 5/5 result against the five criteria for this educational project:
+Завершённые свидетельства в репозитории подтверждают результат 5/5 по пяти критериям для данного учебного проекта:
 
-1. **Contributor ownership: 1/1.** Tatyana authored [PR #25](https://github.com/aaminter/star-bank-recommendation/pull/25), delivering the dynamic-rule persistence and CRUD module.
-2. **Code review: 1/1.** PR #25 contains two formal `CHANGES_REQUESTED` reviews, contributor fixes and resolved review threads, followed by `APPROVED`.
-3. **Architecture: 1/1.** ADR-001, ADR-002 and ADR-003 have status Accepted; the contributor confirmed agreement in [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
-4. **Integration: 1/1.** Cross-module acceptance is recorded in [Issue #13](https://github.com/aaminter/star-bank-recommendation/issues/13); integration changes were merged through PRs #29, #30 and #31.
-5. **Quality and learning: 1/1.** CI checks passed; [PR #33](https://github.com/aaminter/star-bank-recommendation/pull/33) was merged with the expanded target-branch workflow; [Issue #17](https://github.com/aaminter/star-bank-recommendation/issues/17) and [PR #35](https://github.com/aaminter/star-bank-recommendation/pull/35) document the retrospective and its five follow-up actions.
+1. **Ответственность участника: 1/1.** Татьяна создала [PR #25](https://github.com/aaminter/star-bank-recommendation/pull/25), реализовав модуль хранения динамических правил и операций CRUD.
+2. **Проверка кода: 1/1.** В PR #25 есть два формальных заключения `CHANGES_REQUESTED`, исправления участника и решённые обсуждения проверки, после чего вынесено заключение `APPROVED`.
+3. **Архитектура: 1/1.** ADR-001, ADR-002 и ADR-003 имеют статус Accepted; участник подтвердил согласие в [Issue #15](https://github.com/aaminter/star-bank-recommendation/issues/15).
+4. **Интеграция: 1/1.** Межмодульная приёмка зафиксирована в [Issue #13](https://github.com/aaminter/star-bank-recommendation/issues/13); интеграционные изменения объединены через PR #29, #30 и #31.
+5. **Качество и обучение: 1/1.** Проверки CI прошли успешно; [PR #33](https://github.com/aaminter/star-bank-recommendation/pull/33) был объединён с расширенным workflow для целевых ветвей; [Issue #17](https://github.com/aaminter/star-bank-recommendation/issues/17) и [PR #35](https://github.com/aaminter/star-bank-recommendation/pull/35) документируют ретроспективу и пять последующих действий.
 
-### Measured examples
+### Измеренные примеры
 
-- Issue #4 lead time: 24 days, 1 hour, 56 minutes, 53 seconds.
-- PR #25 time to first substantive review: 17 hours, 5 minutes, 48 seconds.
-- PR #25 time from opening to approval: 5 days, 13 hours, 17 minutes, 22 seconds.
-- PR #25 review outcomes: two `CHANGES_REQUESTED` submissions followed by one `APPROVED`.
-- PR #25 final recorded CI result: 34 tests, no errors.
-- PR #33 recorded result: 71 tests, zero errors, zero failures and two skipped tests; GitHub Actions checks passed.
+- Время выполнения Issue #4: 24 дня, 1 час, 56 минут, 53 секунды.
+- Время до первой содержательной проверки PR #25: 17 часов, 5 минут, 48 секунд.
+- Время от открытия PR #25 до одобрения: 5 дней, 13 часов, 17 минут, 22 секунды.
+- Результаты формальной проверки PR #25: два заключения `CHANGES_REQUESTED`, затем одно `APPROVED`.
+- Итоговый зафиксированный результат CI для PR #25: 34 теста, без ошибок.
+- Зафиксированный результат PR #33: 71 тест, ноль ошибок, ноль провалов и два пропущенных теста; проверки GitHub Actions прошли успешно.
 
-These measurements are specific to the cited Issues and PRs. They are not presented as project-wide averages.
+Эти измерения относятся к указанным Issues и PR. Они не представлены как средние значения по всему проекту.
 
-**Scope limitation:** this sprint demonstrates technical coordination and early Team Lead practices in one educational project. It does not, by itself, prove production Team Lead experience.
+**Ограничение оценки:** этот цикл демонстрирует практики технической координации и начальные навыки Team Lead в рамках одного учебного проекта. Сам по себе он не подтверждает опыт работы Team Lead в промышленной среде.
