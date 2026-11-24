@@ -5,6 +5,10 @@ import java.util.Objects;
 
 /**
  * Immutable condition used by the dynamic rule evaluation engine.
+ *
+ * @param query supported metric query identifier
+ * @param arguments immutable arguments required by the query
+ * @param negate whether the condition result must be inverted
  */
 public record DynamicRuleCondition(
         String query,

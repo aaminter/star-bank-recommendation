@@ -33,10 +33,20 @@ public class RuleStats {
         this.count = count;
     }
 
+    /**
+     * Returns the identifier of the rule whose executions are counted.
+     *
+     * @return dynamic rule identifier
+     */
     public Long getRuleId() {
         return ruleId;
     }
 
+    /**
+     * Returns the number of times the rule has been triggered.
+     *
+     * @return execution count
+     */
     public Long getCount() {
         return count;
     }

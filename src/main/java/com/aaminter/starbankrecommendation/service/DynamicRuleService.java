@@ -128,6 +128,13 @@ public class DynamicRuleService {
         repository.deleteById(id);
     }
 
+    /**
+     * Converts a persisted entity to an API DTO by deserializing its JSON conditions.
+     *
+     * @param entity persisted dynamic rule
+     * @return DTO containing the entity fields and deserialized conditions
+     * @throws InvalidDynamicRuleException if the stored condition JSON cannot be deserialized
+     */
     private DynamicRuleDto mapToDto(DynamicRule entity) {
         try {
             List<RuleQueryDto> queries = objectMapper.readValue(

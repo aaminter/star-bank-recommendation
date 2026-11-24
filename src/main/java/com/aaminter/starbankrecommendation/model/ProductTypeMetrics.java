@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 
 /**
  * Transaction metrics aggregated for a single product type.
+ *
+ * @param transactionCount number of transactions for this product type
+ * @param depositSum total amount deposited
+ * @param withdrawSum total amount withdrawn
  */
 public record ProductTypeMetrics(
         long transactionCount,
